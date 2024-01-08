@@ -213,7 +213,7 @@ public class HostServer implements AutoCloseable {
 
         /**
          * close
-         * closes the client socket and its I/O streams
+         * closes the client socket and its I/O streams.
          * @throws IOException If an I/O error occurs
          */
         public void close() throws IOException {
@@ -222,8 +222,14 @@ public class HostServer implements AutoCloseable {
             this.client.getSocket().close();
         }
 
+        /**
+         * handle
+         * handles the client socket connection.
+         * @throws IOException If an I/O error occurs
+         */
         public void handle() throws IOException {
-            String name = input.readLine();
+            // Check for valid name
+            String name = this.input.readLine();
 
             if (nameSet.contains(name)) {
                 output.write(ServerCode.DISCONNECT.ordinal());
@@ -231,9 +237,9 @@ public class HostServer implements AutoCloseable {
                 return;
             }
 
-            connections.add(client);
-            client.setName(name);
+            this.client.setName(name);
             nameSet.add(name);
+            connections.add(this.client);
 
             // Call connect listeners
             synchronized (onConnectSubscribers) {
@@ -251,6 +257,7 @@ public class HostServer implements AutoCloseable {
 
             while (state != ServerState.CLOSED) {
                 if (state == ServerState.CORRESPONDING) {
+                    // Send next screen message to client
                     if (!broadcastNext) {
                         heartbeat.cancel();
 
@@ -260,6 +267,7 @@ public class HostServer implements AutoCloseable {
                         broadcastNext = true;
                     }
 
+                    // Read sent code
                     int c = this.input.read();
 
                     if (c != -1) {
@@ -268,8 +276,7 @@ public class HostServer implements AutoCloseable {
                         if (!reading) {
                             reading = true;
                         }
-                    }
-                    else if (reading) {
+                    } else if (reading) {
                         break;
                     }
                 }
@@ -278,6 +285,10 @@ public class HostServer implements AutoCloseable {
             System.out.println(code);
         }
 
+        /**
+         * run
+         * handles the client socket connection.
+         */
         @Override
         public void run() {
             try {
@@ -296,16 +307,28 @@ public class HostServer implements AutoCloseable {
         }
     }
 
+    /**
+     * Sends a message to the client socket to verify its aliveness.
+     * @author Harry Xu
+     * @version 1.0 - December 24th 2023
+     */
     public class SocketHeartbeat extends TimerTask {
-
         private final ClientConnection client;
         private final OutputStreamWriter output;
 
+        /**
+         * Instantiates a {@link SocketHeartbeat} with a client connection.
+         * @throws IOException if an I/O error occurs
+         */
         public SocketHeartbeat(ClientConnection client) throws IOException {
             this.client = client;
             this.output = new OutputStreamWriter(client.getSocket().getOutputStream());
         }
 
+        /**
+         * run
+         * handles the client socket connection.
+         */
         @Override
         public void run() {
             try {
@@ -315,7 +338,7 @@ public class HostServer implements AutoCloseable {
                 // Socket closed
                 connections.remove(client);
 
-                // Remove name
+                // Remove name from name set
                 String clientName = client.getName();
 
                 if (clientName != null) {
@@ -329,15 +352,14 @@ public class HostServer implements AutoCloseable {
                     }
                 }
 
+                // Cancel task
                 this.cancel();
             } catch (IOException e) {
                 e.printStackTrace();
+
+                // Cancel task
                 this.cancel();
             }
         }
     }
-
-
-
-
 }
