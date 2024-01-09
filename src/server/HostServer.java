@@ -154,7 +154,6 @@ public class HostServer implements AutoCloseable {
                 try {
                     client = new ClientConnection(serverSocket.accept());
                 } catch (IOException e) {
-                    e.printStackTrace();
                     continue;
                 }
 
@@ -282,7 +281,7 @@ public class HostServer implements AutoCloseable {
                 }
             }
 
-            System.out.println(code);
+            this.client.setCode(code.toString());
         }
 
         /**

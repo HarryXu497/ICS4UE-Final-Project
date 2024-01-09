@@ -12,7 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 
-public class HostApplication implements AutoCloseable {
+public class HostApplication {
     private final HostServer server;
 
     private final JFrame frame;
@@ -22,6 +22,7 @@ public class HostApplication implements AutoCloseable {
         try {
             GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/OpenSans.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/JetBrainsMono.ttf")));
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -54,7 +55,6 @@ public class HostApplication implements AutoCloseable {
         this.frame.repaint();
     }
 
-    @Override
     public void close() throws IOException {
         this.server.close();
     }

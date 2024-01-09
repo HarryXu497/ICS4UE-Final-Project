@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class ClientApplication implements AutoCloseable {
+public class ClientApplication {
     private final JFrame frame;
     private final JoinPanel joinPanel;
     private WaitingPanel waitingPanel;
@@ -28,6 +28,7 @@ public class ClientApplication implements AutoCloseable {
         try {
             GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/OpenSans.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/JetBrainsMono.ttf")));
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -100,7 +101,6 @@ public class ClientApplication implements AutoCloseable {
         }
     }
 
-    @Override
     public void close() throws IOException {
         if (this.client == null) {
             return;
