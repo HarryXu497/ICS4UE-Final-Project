@@ -96,6 +96,8 @@ public class ClientApplication {
     private void sendProgram(String program) {
         try {
             output.write(program);
+            output.write(ServerCode.SUBMISSION_FINISHED.ordinal());
+            output.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -6,10 +6,7 @@ import ui.components.CustomButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
@@ -37,15 +34,13 @@ public class CodePanel extends JPanel {
         constraints.weightx = 8;
         constraints.weighty = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        Font codeFieldFont = new Font(Const.MONOSPACE_FONT, Font.PLAIN, 16);
-        this.codeField.setFont(codeFieldFont);
+        this.codeField.setFont(new Font(Const.MONOSPACE_FONT, Font.PLAIN, 16));
         this.codeField.setLineWrap(true);
         this.codeField.setTabSize(2);
         this.codeField.setWrapStyleWord(true);
         this.codeField.setColumns(20);
 
         JScrollPane scrollPane = new JScrollPane(this.codeField);
-//        scrollPane.add(this.codeField);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         this.add(scrollPane, constraints);
@@ -62,6 +57,4 @@ public class CodePanel extends JPanel {
             onSubmit.accept(codeField.getText());
         }
     }
-
-
 }

@@ -30,6 +30,9 @@ public class HostServer implements AutoCloseable {
     /** Functions to call when a socket disconnects */
     private final List<Consumer<ClientConnection>> onDisconnectSubscribers;
 
+    /** Functions to call when a client submits their code */
+    private final List<Consumer<ClientConnection>> onSubmissionSubscribers;
+
     private final ServerSocket serverSocket;
     private final Set<ClientConnection> connections;
     private final Set<String> nameSet;
@@ -43,6 +46,7 @@ public class HostServer implements AutoCloseable {
     public HostServer() throws IOException {
         this.onConnectSubscribers = new ArrayList<>();
         this.onDisconnectSubscribers = new ArrayList<>();
+        this.onSubmissionSubscribers = new ArrayList<>();
 
         // Use port 0 to get auto-allocated port
         this.serverSocket = new ServerSocket(0);
@@ -93,6 +97,15 @@ public class HostServer implements AutoCloseable {
     }
 
     /**
+     * onSubmit
+     * Adds a listener function to call when a client socket submits code
+     * @param subscriber the callback function
+     */
+    public void onSubmit(Consumer<ClientConnection> subscriber) {
+        this.onSubmissionSubscribers.add(subscriber);
+    }
+
+    /**
      * getInetAddress
      * Gets the ip address of the socket.
      * @return the ip address
@@ -117,6 +130,15 @@ public class HostServer implements AutoCloseable {
      */
     public int getNumConnections() {
         return this.connections.size();
+    }
+
+    /**
+     * getConnections
+     * Gets the connection pool of the server
+     * @return the connection pool
+     */
+    public Set<ClientConnection> getConnections() {
+        return this.connections;
     }
 
     /**
@@ -251,7 +273,6 @@ public class HostServer implements AutoCloseable {
             Timer heartbeat = createHeartbeat();
 
             StringBuilder code = new StringBuilder();
-            boolean reading = false;
             boolean broadcastNext = false;
 
             while (state != ServerState.CLOSED) {
@@ -269,19 +290,23 @@ public class HostServer implements AutoCloseable {
                     // Read sent code
                     int c = this.input.read();
 
-                    if (c != -1) {
+                    if (c != ServerCode.SUBMISSION_FINISHED.ordinal()) {
                         code.append((char) c);
-
-                        if (!reading) {
-                            reading = true;
-                        }
-                    } else if (reading) {
+                    } else {
                         break;
                     }
                 }
             }
 
             this.client.setCode(code.toString());
+
+
+            // Call submit listeners
+            synchronized (onSubmissionSubscribers) {
+                for (Consumer<ClientConnection> onSubmit : onSubmissionSubscribers) {
+                    onSubmit.accept(this.client);
+                }
+            }
         }
 
         /**

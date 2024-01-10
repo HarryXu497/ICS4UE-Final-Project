@@ -17,6 +17,7 @@ public class HostApplication {
 
     private final JFrame frame;
     private final HostPanel hostPanel;
+    private SubmissionsPanel submissionsPanel;
 
     static {
         try {
@@ -49,8 +50,9 @@ public class HostApplication {
     public void switchScreen() {
         this.server.setState(ServerState.CORRESPONDING);
 
+        this.submissionsPanel = new SubmissionsPanel(this.server);
         this.frame.remove(this.hostPanel);
-        this.frame.add(new SubmissionsPanel(), BorderLayout.CENTER);
+        this.frame.add(this.submissionsPanel, BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
     }

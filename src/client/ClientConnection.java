@@ -1,9 +1,11 @@
 package client;
 
 import java.net.Socket;
+import java.time.LocalTime;
 
 public class ClientConnection {
     private final Socket client;
+    private LocalTime submissionTime;
     private String name;
     private String code;
 
@@ -23,11 +25,20 @@ public class ClientConnection {
         return this.code;
     }
 
+    public LocalTime getSubmissionTime() {
+        return this.submissionTime;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
     public void setCode(String code) {
         this.code = code;
+        this.submissionTime = LocalTime.now();
+    }
+
+    public boolean hasSubmitted() {
+        return this.code != null;
     }
 }
