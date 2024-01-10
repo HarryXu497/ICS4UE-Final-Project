@@ -25,8 +25,11 @@ public class CodeViewFrame extends JFrame {
         codeView.setTabSize(2);
         codeView.setWrapStyleWord(true);
         codeView.setColumns(20);
+        codeView.setEditable(false);
 
+        nameView.setFont(new Font(Const.DEFAULT_FONT, Font.BOLD, 24));
         nameView.setText(client.getName());
+        nameView.setAlignmentX(0.5F);
 
         JScrollPane scrollPane = new JScrollPane(codeView);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
