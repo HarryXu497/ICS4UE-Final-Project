@@ -1,5 +1,6 @@
 package client;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalTime;
 
@@ -40,5 +41,9 @@ public class ClientConnection {
 
     public boolean hasSubmitted() {
         return this.code != null;
+    }
+
+    public void close() throws IOException {
+        this.client.close();
     }
 }

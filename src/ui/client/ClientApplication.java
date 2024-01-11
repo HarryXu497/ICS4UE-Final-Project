@@ -1,5 +1,6 @@
 package ui.client;
 
+import client.ClientConnection;
 import server.ServerCode;
 import ui.Const;
 
@@ -20,7 +21,7 @@ public class ClientApplication {
     private WaitingPanel waitingPanel;
     private CodePanel codePanel;
 
-    private Socket client;
+    private ClientConnection client;
     private InputStreamReader input;
     private OutputStreamWriter output;
 
@@ -50,16 +51,17 @@ public class ClientApplication {
 
     private void connectSocket(String ip, int port, String name) throws IOException {
         try {
-            this.client = new Socket(ip, port);
+            this.client = new ClientConnection(new Socket(ip, port));
         } catch (IllegalArgumentException e) {
             // Custom error message
             throw new IllegalArgumentException("Port " + port + " out of range");
         }
 
         // Access I/O streams
-        this.client.setSoTimeout(2000);
-        this.input = new InputStreamReader(this.client.getInputStream());
-        this.output = new OutputStreamWriter(this.client.getOutputStream());
+        Socket clientSocket = this.client.getSocket();;
+        clientSocket.setSoTimeout(2000);
+        this.input = new InputStreamReader(clientSocket.getInputStream());
+        this.output = new OutputStreamWriter(clientSocket.getOutputStream());
 
         // Attempt to write name to host
         this.output.write(name);
@@ -73,6 +75,8 @@ public class ClientApplication {
             throw new IllegalArgumentException("Name '" + name + "' taken");
         }
 
+        this.client.setName(name);
+
         // Valid name -> next panel
         this.waitingPanel = new WaitingPanel();
         this.frame.remove(this.joinPanel);
@@ -85,7 +89,7 @@ public class ClientApplication {
     }
 
     private void endWaiting() {
-        this.codePanel = new CodePanel(this::sendProgram);
+        this.codePanel = new CodePanel(this.client, this::sendProgram);
         this.waitingPanel.stopTimer();
         this.frame.remove(this.waitingPanel);
         this.frame.add(this.codePanel, BorderLayout.CENTER);

@@ -1,5 +1,6 @@
 package ui.client;
 
+import client.ClientConnection;
 import ui.Const;
 import ui.components.CustomButton;
 
@@ -14,11 +15,12 @@ import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
 public class CodePanel extends JPanel {
-
+    private final ClientConnection client;
     private final Consumer<String> onSubmit;
     private final JTextArea codeField;
 
-    public CodePanel(Consumer<String> onSubmit) {
+    public CodePanel(ClientConnection client, Consumer<String> onSubmit) {
+        this.client = client;
         this.onSubmit = onSubmit;
 
         this.setLayout(new GridBagLayout());
@@ -39,6 +41,7 @@ public class CodePanel extends JPanel {
         this.codeField.setTabSize(2);
         this.codeField.setWrapStyleWord(true);
         this.codeField.setColumns(20);
+        this.codeField.setText(generateStarterCode(this.client.getName()));
 
         JScrollPane scrollPane = new JScrollPane(this.codeField);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -49,6 +52,16 @@ public class CodePanel extends JPanel {
         constraints.weightx = 2;
         constraints.weighty = 1;
         this.add(submitButton, constraints);
+    }
+
+    private static String generateStarterCode(String name) {
+        return "import temp.*;\n" +
+                "\n" +
+                "public class " + name + "Player extends Player {\n" +
+                "\tpublic void move(Data data) {\n" +
+                "\t\t\\\\ Your code here ...\n" +
+                "\t}\n" +
+                "}\n";
     }
 
     private class SubmitListener extends MouseAdapter {

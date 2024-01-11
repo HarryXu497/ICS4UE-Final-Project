@@ -1,7 +1,7 @@
 package ui.host;
 
-import function.Procedure;
 import client.ClientConnection;
+import function.Procedure;
 import server.HostServer;
 import ui.components.CustomButton;
 import ui.components.CustomLabel;
@@ -10,8 +10,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class HostPanel extends JPanel {
     private final Procedure onStart;
@@ -32,7 +32,7 @@ public class HostPanel extends JPanel {
         this.connectionsLabel = new CustomLabel("Connections: ", Integer.toString(0));
 
         this.startButton = new CustomButton("Start");
-        this.startButton.addMouseListener(new OnStartListener());
+        this.startButton.addActionListener(new OnStartListener());
 
         // Alignment
         ipLabel.setAlignmentX(0.5F);
@@ -56,9 +56,9 @@ public class HostPanel extends JPanel {
         this.connectionsLabel.setContent(Integer.toString(this.host.getNumConnections()));
     }
 
-    private class OnStartListener extends MouseAdapter {
+    private class OnStartListener implements ActionListener {
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void actionPerformed(ActionEvent e) {
             onStart.execute();
         }
     }

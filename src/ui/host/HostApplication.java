@@ -1,7 +1,12 @@
 package ui.host;
 
+import client.ClientConnection;
+import loader.ObjectLoader;
+import loader.ObjectLoaderException;
 import server.HostServer;
 import server.ServerState;
+import temp.Data;
+import temp.Player;
 import ui.Const;
 
 import javax.swing.JFrame;
@@ -14,6 +19,7 @@ import java.io.IOException;
 
 public class HostApplication {
     private final HostServer server;
+    private final ObjectLoader objectLoader;
 
     private final JFrame frame;
     private final HostPanel hostPanel;
@@ -32,6 +38,8 @@ public class HostApplication {
 
     public HostApplication() throws IOException {
         this.server = new HostServer();
+        this.objectLoader = new ObjectLoader();
+
         this.frame = new JFrame("Host");
         this.hostPanel = new HostPanel(this.server, this::switchScreen);
 
@@ -50,11 +58,26 @@ public class HostApplication {
     public void switchScreen() {
         this.server.setState(ServerState.CORRESPONDING);
 
-        this.submissionsPanel = new SubmissionsPanel(this.server);
+        this.submissionsPanel = new SubmissionsPanel(this.server, this::startGame);
         this.frame.remove(this.hostPanel);
         this.frame.add(this.submissionsPanel, BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
+    }
+
+    public void startGame() {
+        for (ClientConnection client : this.server.getConnections()) {
+            Player player;
+
+            try {
+                player = this.objectLoader.load(client);
+            } catch (IOException | ObjectLoaderException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            player.move(new Data("Hello World"));
+        }
     }
 
     public void close() throws IOException {

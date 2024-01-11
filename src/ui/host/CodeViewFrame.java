@@ -3,10 +3,12 @@ package ui.host;
 import client.ClientConnection;
 import ui.Const;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -29,7 +31,8 @@ public class CodeViewFrame extends JFrame {
 
         nameView.setFont(new Font(Const.DEFAULT_FONT, Font.BOLD, 24));
         nameView.setText(client.getName());
-        nameView.setAlignmentX(0.5F);
+        nameView.setHorizontalAlignment(SwingConstants.CENTER);
+        nameView.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JScrollPane scrollPane = new JScrollPane(codeView);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
