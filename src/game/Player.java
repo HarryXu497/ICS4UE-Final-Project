@@ -1,8 +1,9 @@
 package game;
 
+import java.awt.*;
 import java.util.Deque;
 
-public abstract class Player {
+public abstract class Player extends GameObject {
     private int battery;
     private int power;
     private int fightingPoint;
@@ -32,4 +33,8 @@ public abstract class Player {
     }
     public int getPower() { return this.power; }
     public int getFightingPoint() { return this.fightingPoint; }
+
+    void draw(Graphics g, int x, int y) {
+        g.drawRect(x + 10, y + 10, 20, 20);
+    }
 }
