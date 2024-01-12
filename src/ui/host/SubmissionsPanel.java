@@ -1,7 +1,6 @@
 package ui.host;
 
 import client.ClientConnection;
-import com.sun.security.ntlm.Client;
 import function.Procedure;
 import server.HostServer;
 import ui.Const;
