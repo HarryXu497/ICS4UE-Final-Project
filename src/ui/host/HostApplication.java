@@ -69,6 +69,10 @@ public class HostApplication {
         this.server.setState(ServerState.CLOSED);
 
         for (ClientConnection client : this.server.getConnections()) {
+            if (!client.hasSubmitted()) {
+                continue;
+            }
+
             Player player;
 
             try {

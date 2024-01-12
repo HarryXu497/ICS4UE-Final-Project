@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.function.Consumer;
 
 public class CodeViewFrame extends JFrame {
@@ -61,6 +62,8 @@ public class CodeViewFrame extends JFrame {
             client.deleteCode();
 
             onDelete.accept(client);
+
+            dispatchEvent(new WindowEvent(CodeViewFrame.this, WindowEvent.WINDOW_CLOSING));
         }
     }
 }
