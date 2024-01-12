@@ -1,12 +1,12 @@
 package ui.host;
 
 import client.ClientConnection;
+import game.Player;
+import game.internal.panel.GamePanel;
 import loader.ObjectLoader;
 import loader.ObjectLoaderException;
 import server.HostServer;
 import server.ServerState;
-import temp.Data;
-import temp.Player;
 import ui.Const;
 
 import javax.swing.JFrame;
@@ -16,6 +16,8 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HostApplication {
     private final HostServer server;
@@ -24,6 +26,7 @@ public class HostApplication {
     private final JFrame frame;
     private final HostPanel hostPanel;
     private SubmissionsPanel submissionsPanel;
+    private GamePanel gamePanel;
 
     static {
         try {
@@ -66,6 +69,8 @@ public class HostApplication {
     }
 
     public void startGame() {
+        Set<Player> players = new HashSet<>();
+
         for (ClientConnection client : this.server.getConnections()) {
             Player player;
 
@@ -76,8 +81,16 @@ public class HostApplication {
                 continue;
             }
 
-            player.move(new Data("Hello World"));
+            players.add(player);
         }
+
+        this.gamePanel = new GamePanel(players);
+        this.frame.remove(this.submissionsPanel);
+        this.frame.add(this.gamePanel, BorderLayout.CENTER);
+        this.frame.revalidate();
+        this.frame.repaint();
+
+        this.gamePanel.start();
     }
 
     public void close() throws IOException {

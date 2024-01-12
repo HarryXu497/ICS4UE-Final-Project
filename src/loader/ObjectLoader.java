@@ -1,7 +1,7 @@
 package loader;
 
 import client.ClientConnection;
-import temp.Player;
+import game.Player;
 
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;

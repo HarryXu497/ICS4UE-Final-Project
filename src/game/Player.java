@@ -1,6 +1,10 @@
 package game;
 
-import game.data.Data;
+import game.internal.actions.Action;
+import game.internal.actions.Direction;
+import game.internal.actions.Move;
+import game.internal.actions.Turn;
+import game.internal.entities.GameObject;
 
 import java.awt.*;
 import java.util.ArrayDeque;
@@ -19,12 +23,31 @@ public abstract class Player extends GameObject {
 
     // Methods accessible to game
     void fight(Player enemy) {
-        // TODO: implement this
+        this.setHealth(this.getHealth() - enemy.getPower());
+        enemy.setHealth(enemy.getHealth() - this.getPower());
+    }
+
+    Deque<Action> getActions() {
+        return this.actions;
     }
 
     @Override
-    void draw(Graphics g, int x, int y) {
-        g.drawRect(x + 10, y + 10, 20, 20);
+    public void draw(Graphics g, int x, int y, int gridSize) {
+        int offset = (gridSize / 2) - 10;
+        g.setColor(Color.RED);
+        g.drawRect(x - offset, y - offset, 20, 20);
+    }
+
+    void setHealth(int newHealth) {
+        this.health = Math.max(0, newHealth);
+    }
+
+    void setPower(int newPower) {
+        this.power = Math.max(0, newPower);
+    }
+
+    void setCurrency(int newCurrency) {
+        this.currency = Math.max(0, newCurrency);
     }
 
     // Methods accessible to user
@@ -58,5 +81,5 @@ public abstract class Player extends GameObject {
     }
 
     // Abstract methods
-    public abstract void cycle(Data data);
+    public abstract void cycle(Data data, Shop shop);
 }

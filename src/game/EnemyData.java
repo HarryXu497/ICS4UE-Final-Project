@@ -1,6 +1,4 @@
-package game.data;
-
-import game.Player;
+package game;
 
 import java.awt.Point;
 
