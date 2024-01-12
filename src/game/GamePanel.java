@@ -1,6 +1,6 @@
 package game;
 
-import javax.swing.JPanel;
+import  javax.swing.JPanel;
 import java.util.Set;
 
 public class GamePanel extends JPanel {
