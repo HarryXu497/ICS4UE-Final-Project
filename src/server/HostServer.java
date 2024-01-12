@@ -293,18 +293,16 @@ public class HostServer implements AutoCloseable {
                     if (c != ServerCode.SUBMISSION_FINISHED.ordinal()) {
                         code.append((char) c);
                     } else {
-                        break;
+                        this.client.setCode(code.toString());
+                        code = new StringBuilder();
+
+                        // Call submit listeners
+                        synchronized (onSubmissionSubscribers) {
+                            for (Consumer<ClientConnection> onSubmit : onSubmissionSubscribers) {
+                                onSubmit.accept(this.client);
+                            }
+                        }
                     }
-                }
-            }
-
-            this.client.setCode(code.toString());
-
-
-            // Call submit listeners
-            synchronized (onSubmissionSubscribers) {
-                for (Consumer<ClientConnection> onSubmit : onSubmissionSubscribers) {
-                    onSubmit.accept(this.client);
                 }
             }
         }

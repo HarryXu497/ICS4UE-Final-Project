@@ -39,6 +39,11 @@ public class ClientConnection {
         this.submissionTime = LocalTime.now();
     }
 
+    public void deleteCode() {
+        this.code = null;
+        this.submissionTime = null;
+    }
+
     public boolean hasSubmitted() {
         return this.code != null;
     }

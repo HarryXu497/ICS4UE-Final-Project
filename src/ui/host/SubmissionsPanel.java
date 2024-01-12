@@ -1,6 +1,7 @@
 package ui.host;
 
 import client.ClientConnection;
+import com.sun.security.ntlm.Client;
 import function.Procedure;
 import server.HostServer;
 import ui.Const;
@@ -24,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 public class SubmissionsPanel extends JPanel {
     private final HostServer server;
@@ -48,9 +50,8 @@ public class SubmissionsPanel extends JPanel {
         header.setAlignmentX(0.5f);
 
         this.submissions = new JList<>();
-        this.submissions.addMouseListener(new ViewCodeListener());
+        this.submissions.addMouseListener(new ViewCodeListener(this::updateData));
         this.submissions.setFont(new Font(Const.MONOSPACE_FONT, Font.PLAIN, 16));
-//        this.submissions.setMinimumSize(new Dimension(Const.FRAME_WIDTH - 200, Const.FRAME_HEIGHT - 100));
         this.submissions.setVisibleRowCount(20);
         JScrollPane scrollPane = new JScrollPane(this.submissions);
 
@@ -85,11 +86,18 @@ public class SubmissionsPanel extends JPanel {
     }
 
     private class ViewCodeListener extends MouseAdapter {
+
+        private final Consumer<ClientConnection> onDelete;
+
+        public ViewCodeListener(Consumer<ClientConnection> onDelete) {
+            this.onDelete = onDelete;
+        }
+
         @Override
         public void mouseClicked(MouseEvent e) {
             int submissionIndex = submissions.getSelectedIndex();
             ClientConnection client = clients.get(submissionIndex);
-            CodeViewFrame codeViewFrame = new CodeViewFrame(client);
+            CodeViewFrame codeViewFrame = new CodeViewFrame(client, this.onDelete);
             codeViewFrame.setVisible(true);
         }
     }

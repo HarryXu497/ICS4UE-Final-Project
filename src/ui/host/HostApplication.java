@@ -69,9 +69,15 @@ public class HostApplication {
     }
 
     public void startGame() {
+        this.server.setState(ServerState.CLOSED);
+
         Set<Player> players = new HashSet<>();
 
         for (ClientConnection client : this.server.getConnections()) {
+            if (!client.hasSubmitted()) {
+                continue;
+            }
+
             Player player;
 
             try {
