@@ -66,6 +66,8 @@ public class HostApplication {
     }
 
     public void startGame() {
+        this.server.setState(ServerState.CLOSED);
+
         for (ClientConnection client : this.server.getConnections()) {
             Player player;
 
