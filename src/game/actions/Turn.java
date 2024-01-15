@@ -1,5 +1,9 @@
 package game.actions;
 
+/**
+ * Represents a turn movement relative to the player's current direction
+ *
+ * */
 public enum Turn implements MovementAction {
     LEFT,
     RIGHT,

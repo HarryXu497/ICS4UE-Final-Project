@@ -1,13 +1,10 @@
 package game;
 
 import client.ClientConnection;
-import game.actions.Direction;
 import game.actions.Move;
-import game.actions.MovementAction;
-import game.actions.Turn;
+import game.internal.assets.Assets;
 import game.internal.entities.Currency;
 import game.internal.entities.GameObject;
-import game.internal.assets.Assets;
 import loader.ObjectLoader;
 import loader.ObjectLoaderException;
 
@@ -16,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -223,52 +219,35 @@ public class GamePanel extends JPanel {
     }
 
     public void movePlayer(Player player, int x, int y) {
-        Deque<MovementAction> movementActions = player.getMovementActions();
+        Move move = player.getMove();
 
-        boolean hasMoved = false;
+        if (move != null) {
+            int newY = y + move.getDeltaY();
+            int newX = x + move.getDeltaX();
 
-        while (!movementActions.isEmpty()) {
-            MovementAction currentMovementAction = movementActions.pop();
-
-            if ((currentMovementAction instanceof Move) && (!hasMoved)) {
-                Move move = (Move) currentMovementAction;
-
-                int newY = y + move.getDeltaY();
-                int newX = x + move.getDeltaX();
-
-                if ((newY < 0) || (newY >= this.map.length)) {
-                    newY = y;
-                }
-
-                if ((newX < 0) || (newX >= this.map[newY].length)) {
-                    newX = x;
-                }
-
-                GameObject newObject = this.map[newY][newX];
-
-                hasMoved = true;
-
-                // Collisions
-                if (player != newObject) {
-                    if (newObject instanceof Currency) {
-                        player.setCurrency(player.getCurrency() + 1);
-                    } else if (newObject instanceof Player) {
-                        Player enemy = (Player) newObject;
-
-                        player.fight(enemy);
-                        continue;
-                    }
-                }
-
-                this.map[y][x] = null;
-                this.map[newY][newX] = player;
+            if ((newY < 0) || (newY >= this.map.length)) {
+                newY = y;
             }
 
-            if (currentMovementAction instanceof Turn) {
-                Turn turn = (Turn) currentMovementAction;
-                Direction newDirection = turn.turn(player.getDirection());
-                player.setDirection(newDirection);
+            if ((newX < 0) || (newX >= this.map[newY].length)) {
+                newX = x;
             }
+
+            GameObject newObject = this.map[newY][newX];
+
+            // Collisions
+            if (player != newObject) {
+                if (newObject instanceof Currency) {
+                    player.setCurrency(player.getCurrency() + 1);
+                } else if (newObject instanceof Player) {
+                    Player enemy = (Player) newObject;
+
+                    player.fight(enemy);
+                }
+            }
+
+            this.map[y][x] = null;
+            this.map[newY][newX] = player;
         }
     }
 

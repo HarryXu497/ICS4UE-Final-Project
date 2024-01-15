@@ -2,8 +2,6 @@ package game;
 
 import game.actions.Direction;
 import game.actions.Move;
-import game.actions.MovementAction;
-import game.actions.Turn;
 import game.internal.assets.Assets;
 import game.internal.assets.PlayerAssets;
 import game.internal.entities.GameObject;
@@ -13,8 +11,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Represents a player in the game.
@@ -48,7 +44,7 @@ public abstract class Player extends GameObject {
     private int range;
 
     /** Movement */
-    private final Deque<MovementAction> movementActions;
+    private Move move;
     private Direction direction;
     private Direction lastXDirection;
     private boolean moved;
@@ -63,10 +59,9 @@ public abstract class Player extends GameObject {
         this.currency = DEFAULT_CURRENCY;
         this.range = DEFAULT_RANGE;
 
-        this.movementActions = new ArrayDeque<>();
+        this.move = null;
         this.direction = Direction.UP;
         this.lastXDirection = Direction.RIGHT;
-        this.moved = false;
         this.damaged = false;
 
         // Sprites
@@ -86,14 +81,14 @@ public abstract class Player extends GameObject {
      * @param shop allows the player to purchase upgrades in exchange for currency
      */
     void update(Data data, Shop shop) {
-        this.moved = false;
+        this.move = null;
         this.cycle(data, shop);
 
         PlayerAssets sprites = Assets.getInstance().getPlayer();
 
         if (this.damaged) {
             this.sprites = sprites.getHurtSprites();
-        } else if (this.moved) {
+        } else if (this.move != null) {
             this.sprites = sprites.getMovingSprites();
         } else {
             this.sprites = sprites.getIdleSprites();
@@ -120,15 +115,6 @@ public abstract class Player extends GameObject {
     void fight(Player enemy) {
         this.setHealth(this.getHealth() - enemy.getPower());
         enemy.setHealth(enemy.getHealth() - this.getPower());
-    }
-
-    /**
-     * getMovementActions
-     * Gets the queue of movement actions for the game process.
-     * @return the movement action queue
-     */
-    public Deque<MovementAction> getMovementActions() {
-        return this.movementActions;
     }
 
     /**
@@ -249,37 +235,11 @@ public abstract class Player extends GameObject {
      * in the current direction of the player.
      */
     public void move() {
-        this.moved = true;
-
         if ((this.direction == Direction.LEFT) || (this.direction == Direction.RIGHT)) {
             this.lastXDirection = this.direction;
         }
 
-        this.movementActions.add(Move.fromDirection(this.direction));
-    }
-
-    /**
-     * turnLeft
-     * Adds a {@link Turn#LEFT} action onto the action stack.
-     */
-    public void turnLeft() {
-        this.movementActions.add(Turn.LEFT);
-    }
-
-    /**
-     * turnRight
-     * Adds a {@link Turn#RIGHT} action onto the action stack.
-     */
-    public void turnRight() {
-        this.movementActions.add(Turn.RIGHT);
-    }
-
-    /**
-     * turnBack
-     * Adds a {@link Turn#BACK} action onto the action stack.
-     */
-    public void turnBack() {
-        this.movementActions.add(Turn.BACK);
+        this.move = Move.fromDirection(this.direction);
     }
 
     /**
@@ -334,6 +294,15 @@ public abstract class Player extends GameObject {
      */
     public Direction getDirection() {
         return this.direction;
+    }
+
+    /**
+     * getMove
+     * Gets the player's move.
+     * @return the move of the player
+     */
+    public Move getMove() {
+        return this.move;
     }
 
     // Abstract methods

@@ -13,7 +13,7 @@ import java.io.IOException;
 public interface ConnectConsumer {
     /**
      * connect
-     * attempts to connect to the socket.
+     * Attempts to connect to the socket.
      * @param ip the ip address of the host socket
      * @param port the port of the host socket
      * @param name the name of the client socket

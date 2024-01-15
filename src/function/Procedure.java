@@ -11,7 +11,7 @@ package function;
 public interface Procedure {
     /**
      * execute
-     * runs the procedure
+     * Runs the procedure
      */
     void execute();
 }

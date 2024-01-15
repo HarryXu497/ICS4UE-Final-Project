@@ -1,5 +1,10 @@
 package game.actions;
 
+/**
+ * Represents a move action by the player.
+ * @author Tommy Shan
+ * @version 1.0 - January 8th 2023
+ */
 public enum Move implements MovementAction {
     UP(0, -1),
     DOWN(0, 1),
@@ -9,19 +14,39 @@ public enum Move implements MovementAction {
     private final int deltaX;
     private final int deltaY;
 
+    /**
+     * Constructs a {@link Move} with a
+     * delta x and delta y associated.
+     */
     Move(int deltaX, int deltaY) {
         this.deltaX = deltaX;
         this.deltaY = deltaY;
     }
 
+    /**
+     * getDeltaX
+     * Gets the change in x coordinate of this move.
+     * @return the change in x
+     */
     public int getDeltaX() {
         return this.deltaX;
     }
 
+    /**
+     * getDeltaY
+     * Gets the change in y coordinate of this move.
+     * @return the change in y
+     */
     public int getDeltaY() {
         return this.deltaY;
     }
 
+    /**
+     * fromDirection
+     * Returns the corresponding move based on the inputted direction.
+     * @param direction the direction to convert
+     * @return the corresponding move action
+     */
     public static Move fromDirection(Direction direction) {
         if (direction == Direction.UP) {
             return Move.UP;
