@@ -45,7 +45,9 @@ public class ObjectLoader {
 
         try (URLClassLoader classLoader = new URLClassLoader(new URL[]{ root.toURI().toURL() })) {
             Class<?> cls = Class.forName(className, true, classLoader);
-            return (Player) cls.getDeclaredConstructor().newInstance();
+            Player player = (Player) cls.getDeclaredConstructor().newInstance();
+            player.setName(client.getName());
+            return player;
         } catch (ClassNotFoundException |InvocationTargetException | InstantiationException |
                  IllegalAccessException | NoSuchMethodException e) {
             throw new ObjectLoaderException(e);

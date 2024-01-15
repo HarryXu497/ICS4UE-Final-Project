@@ -1,6 +1,7 @@
 package ui.client;
 
 import client.ClientConnection;
+import function.Procedure;
 import server.ServerCode;
 import ui.Const;
 
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientApplication {
     private final JFrame frame;
@@ -37,6 +39,7 @@ public class ClientApplication {
     }
 
     public ClientApplication() {
+        // TODO: close frame when game starts
         this.frame = new JFrame("Client");
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setSize(Const.FRAME_WIDTH, Const.FRAME_HEIGHT);
@@ -84,7 +87,7 @@ public class ClientApplication {
         this.frame.revalidate();
         this.frame.repaint();
 
-        WaitingThread waitingThread = new WaitingThread();
+        NextScreenThread waitingThread = new NextScreenThread(this::endWaiting);
         waitingThread.start();
     }
 
@@ -125,9 +128,22 @@ public class ClientApplication {
         }
     }
 
-    private class WaitingThread extends Thread {
+    private class NextScreenThread extends Thread {
+
+        private final Procedure onNextScreen;
+
+        public NextScreenThread(Procedure onNextScreen) {
+            this.onNextScreen = onNextScreen;
+        }
+
         @Override
         public void run() {
+            try {
+                client.getSocket().setSoTimeout(0);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+
             try {
                 int c = input.read();
 
@@ -135,7 +151,7 @@ public class ClientApplication {
                     c = input.read();
 
                     if (c == ServerCode.NEXT_SCREEN.ordinal()) {
-                        endWaiting();
+                        this.onNextScreen.execute();
                         break;
                     }
                 }

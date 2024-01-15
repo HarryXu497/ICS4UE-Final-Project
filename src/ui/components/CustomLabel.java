@@ -12,6 +12,10 @@ public class CustomLabel extends JPanel {
     private final JLabel leadingLabel;
     private final JLabel contentLabel;
 
+    public CustomLabel(String leading) {
+        this(leading, "", DEFAULT_FONT_SIZE);
+    }
+
     public CustomLabel(String leading, String content) {
         this(leading, content, DEFAULT_FONT_SIZE);
     }

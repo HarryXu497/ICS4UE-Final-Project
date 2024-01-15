@@ -1,27 +1,25 @@
 package ui.host;
 
 import client.ClientConnection;
-import game.Player;
-import game.internal.panel.GamePanel;
-import loader.ObjectLoader;
-import loader.ObjectLoaderException;
+import game.GamePanel;
 import server.HostServer;
 import server.ServerState;
 import ui.Const;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class HostApplication {
     private final HostServer server;
-    private final ObjectLoader objectLoader;
 
     private final JFrame frame;
     private final HostPanel hostPanel;
@@ -41,7 +39,6 @@ public class HostApplication {
 
     public HostApplication() throws IOException {
         this.server = new HostServer();
-        this.objectLoader = new ObjectLoader();
 
         this.frame = new JFrame("Host");
         this.hostPanel = new HostPanel(this.server, this::switchScreen);
@@ -71,32 +68,36 @@ public class HostApplication {
     public void startGame() {
         this.server.setState(ServerState.CLOSED);
 
-        Set<Player> players = new HashSet<>();
+        Set<ClientConnection> submittedClients = this.server.getConnections()
+                .stream()
+                .filter(ClientConnection::hasSubmitted)
+                .collect(Collectors.toSet());
 
-        for (ClientConnection client : this.server.getConnections()) {
-            if (!client.hasSubmitted()) {
-                continue;
-            }
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-            Player player;
-
-            try {
-                player = this.objectLoader.load(client);
-            } catch (IOException | ObjectLoaderException e) {
-                e.printStackTrace();
-                continue;
-            }
-
-            players.add(player);
+        // Close server
+        try {
+            this.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred while trying to close the server ");
         }
 
-        this.gamePanel = new GamePanel(players);
+        this.gamePanel = new GamePanel(submittedClients, screenSize, this::onGameWin);
         this.frame.remove(this.submissionsPanel);
+        this.frame.setSize(screenSize);
         this.frame.add(this.gamePanel, BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
 
         this.gamePanel.start();
+    }
+
+    public void onGameWin(String winner) {
+        this.frame.remove(this.gamePanel);
+        this.frame.setSize(new Dimension(Const.FRAME_WIDTH, Const.FRAME_HEIGHT));
+        this.frame.add(new WinPanel(winner), BorderLayout.CENTER);
+        this.frame.revalidate();
+        this.frame.repaint();
     }
 
     public void close() throws IOException {

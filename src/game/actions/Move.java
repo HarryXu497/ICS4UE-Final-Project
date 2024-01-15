@@ -1,6 +1,6 @@
-package game.internal.actions;
+package game.actions;
 
-public enum Move implements Action {
+public enum Move implements MovementAction {
     UP(0, -1),
     DOWN(0, 1),
     LEFT(-1, 0),

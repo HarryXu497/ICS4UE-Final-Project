@@ -55,11 +55,12 @@ public class CodePanel extends JPanel {
     }
 
     private static String generateStarterCode(String name) {
-        return "import game.*;\n" +
+        return  "import game.*;\n" +
+                "import game.actions.*;\n" +
                 "\n" +
                 "public class " + name + "Player extends Player {\n" +
                 "\tpublic void cycle(Data data, Shop shop) {\n" +
-                "\t\t\\\\ Your code here ...\n" +
+                "\t\t// Your code here ...\n" +
                 "\t}\n" +
                 "}\n";
     }

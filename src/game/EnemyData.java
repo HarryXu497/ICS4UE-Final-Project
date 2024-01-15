@@ -1,7 +1,5 @@
 package game;
 
-import java.awt.Point;
-
 public class EnemyData {
     private final Point enemyPosition;
     private final int enemyHealth;
@@ -14,11 +12,11 @@ public class EnemyData {
     }
 
     public int getEnemyX() {
-        return (int) this.enemyPosition.getX();
+        return this.enemyPosition.getX();
     }
 
     public int getEnemyY() {
-        return (int) this.enemyPosition.getY();
+        return this.enemyPosition.getY();
     }
 
     public int getEnemyPower() {

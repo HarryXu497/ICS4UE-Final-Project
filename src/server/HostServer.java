@@ -305,6 +305,11 @@ public class HostServer implements AutoCloseable {
                     }
                 }
             }
+
+
+            // Close clients
+            this.output.write(ServerCode.NEXT_SCREEN.ordinal());
+            this.output.flush();
         }
 
         /**

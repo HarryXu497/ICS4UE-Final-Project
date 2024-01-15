@@ -1,8 +1,8 @@
-package game.internal.actions;
+package game.actions;
 
 public enum Direction {
     UP,
-    DOWN,
     LEFT,
+    DOWN,
     RIGHT;
 }
