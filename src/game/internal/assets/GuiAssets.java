@@ -5,14 +5,29 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Contains GUI-related assets.
+ * @author Tommy Shan
+ * @version 1.0 - January 11th 2023
+ */
 public class GuiAssets {
     private final Image heart;
 
-    public GuiAssets(int size) throws IOException {
+    /**
+     * Constructs a {@link GuiAssets} instance with a sprite size.
+     * @param size the size to resize the sprites to
+     * @throws IOException if an I/O error occur while reading the files
+     */
+    GuiAssets(int size) throws IOException {
         this.heart = ImageIO.read(new File("resources/gui/heart.png"))
                 .getScaledInstance(size / 5, size / 5, Image.SCALE_DEFAULT);
     }
 
+    /**
+     * getCoins
+     * Gets the heart sprites.
+     * @return the heart sprites
+     */
     public Image getHeart() {
         return this.heart;
     }

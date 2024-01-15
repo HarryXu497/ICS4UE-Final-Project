@@ -13,7 +13,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Singleton class to allow for global access to assets (e.g. sprites and fonts) .
+ * @author Tommy Shan
+ * @version 1.0 - January 10th 2023
+ */
 public class Assets {
+    /** Singleton instance */
     private static Assets instance;
 
     private final PlayerAssets player;
@@ -21,6 +27,13 @@ public class Assets {
     private final GuiAssets gui;
     private final CoinAssets coins;
 
+    /**
+     * Constructs assets with sub-asset classes.
+     * @param player the player sub-assets
+     * @param tile the tile sub-assets
+     * @param gui the gui sub-assets
+     * @param coins the coin sub-assets
+     */
     private Assets(PlayerAssets player, TileAssets tile, GuiAssets gui, CoinAssets coins) {
         this.player = player;
         this.tile = tile;
@@ -28,22 +41,49 @@ public class Assets {
         this.coins = coins;
     }
 
+    /**
+     * getPlayer
+     * Gets the player sub-assets.
+     * @return the player sub-assets
+     */
     public PlayerAssets getPlayer() {
         return this.player;
     }
 
+    /**
+     * getTile
+     * Gets the tile sub-assets.
+     * @return the tile sub-assets
+     */
     public TileAssets getTile() {
         return this.tile;
     }
 
+    /**
+     * getGui
+     * Gets the gui sub-assets.
+     * @return the gui sub-assets
+     */
     public GuiAssets getGui() {
         return this.gui;
     }
 
+    /**
+     * getCoins
+     * Gets the coin sub-assets.
+     * @return the coin sub-assets
+     */
     public CoinAssets getCoins() {
         return this.coins;
     }
 
+    /**
+     * initialize
+     * Loads, initializes, and processes the assets,
+     * and sets the instance to the {@link #instance} variable.
+     * @param size the size to load the sprites to
+     * @throws IOException if an I/O error occur while reading the files
+     */
     public static void initialize(int size) throws IOException {
         if (instance != null) {
             return;
@@ -57,6 +97,11 @@ public class Assets {
         );
     }
 
+    /**
+     * getInstance
+     * Gets the singleton instance of the class
+     * @return the singleton {@link Assets} instance
+     */
     public static Assets getInstance() {
         if (instance == null) {
             throw new IllegalStateException("Sprites not initialized");

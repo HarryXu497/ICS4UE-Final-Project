@@ -147,7 +147,7 @@ public class GamePanel extends JPanel {
                         continue;
                     }
 
-                    Data data = new Data(this.map, player, this.players.size(), 10, x, y);
+                    Data data = new Data(this.map, player, this.players.size(), this.currencies.size(), x, y);
                     Shop shop = new Shop(player);
 
                     numPlayers++;
@@ -214,6 +214,7 @@ public class GamePanel extends JPanel {
             // Adds currency only if space is empty
             if (this.map[y][x] == null) {
                 this.map[y][x] = new Currency();
+                this.currencies.add((Currency) this.map[y][x]);
             }
         }
     }
@@ -239,6 +240,7 @@ public class GamePanel extends JPanel {
             if (player != newObject) {
                 if (newObject instanceof Currency) {
                     player.setCurrency(player.getCurrency() + 1);
+                    this.currencies.remove(newObject);
                 } else if (newObject instanceof Player) {
                     Player enemy = (Player) newObject;
 

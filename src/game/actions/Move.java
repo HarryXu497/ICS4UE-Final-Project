@@ -5,7 +5,7 @@ package game.actions;
  * @author Tommy Shan
  * @version 1.0 - January 8th 2023
  */
-public enum Move implements MovementAction {
+public enum Move {
     UP(0, -1),
     DOWN(0, 1),
     LEFT(-1, 0),
