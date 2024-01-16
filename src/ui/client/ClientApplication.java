@@ -4,12 +4,14 @@ import client.ClientConnection;
 import function.Procedure;
 import server.ServerCode;
 import ui.Const;
+import ui.host.CodeViewFrame;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -98,6 +100,10 @@ public class ClientApplication {
         this.frame.add(this.codePanel, BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
+
+        // Start thread to waiting for close message
+        NextScreenThread closeScreenThread = new NextScreenThread(this::closeFrame);
+        closeScreenThread.start();
     }
 
     private void sendProgram(String program) {
@@ -107,6 +113,17 @@ public class ClientApplication {
             output.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void closeFrame() {
+        System.out.println("Closing Frame");
+        this.frame.dispatchEvent(new WindowEvent(this.frame, WindowEvent.WINDOW_CLOSING));
+
+        try {
+            this.close();
+        } catch (IOException e) {
+            System.out.println("Failed to close client socket.");
         }
     }
 
@@ -145,10 +162,8 @@ public class ClientApplication {
             }
 
             try {
-                int c = input.read();
-
-                while (c != -1) {
-                    c = input.read();
+                while (true) {
+                    int c = input.read();
 
                     if (c == ServerCode.NEXT_SCREEN.ordinal()) {
                         this.onNextScreen.execute();

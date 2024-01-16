@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -156,8 +157,18 @@ public class HostServer implements AutoCloseable {
     }
 
     /**
+     * broadcast
+     * Attempts to broadcast a {@link ServerCode} to all clients.
+     * @param code the code ot broadcast
+     */
+    public void broadcast(ServerCode code) {
+        BroadcastThread broadcastThread = new BroadcastThread(code);
+        broadcastThread.start();
+    }
+
+    /**
      * close
-     * closes the server.
+     * Closes the server.
      * @throws IOException if an I/O error occurs when closing the socket
      */
     public void close() throws IOException {
@@ -172,7 +183,7 @@ public class HostServer implements AutoCloseable {
      * @author Harry Xu
      * @version 1.0 - December 24th 2023
      */
-    public class ServerThread extends Thread {
+    private class ServerThread extends Thread {
         public void run() {
             while (state == ServerState.ACCEPTING) {
                 // Accept connection
@@ -200,7 +211,7 @@ public class HostServer implements AutoCloseable {
      * @author Harry Xu
      * @version 1.0 - December 24th 2023
      */
-    public class HandlerThread extends Thread {
+    private class HandlerThread extends Thread {
         private final ClientConnection client;
         private final BufferedReader input;
         private final BufferedWriter output;
@@ -250,7 +261,7 @@ public class HostServer implements AutoCloseable {
 
         /**
          * handle
-         * handles the client socket connection.
+         * Handles the client socket connection.
          * @throws IOException If an I/O error occurs
          */
         public void handle() throws IOException {
@@ -344,7 +355,7 @@ public class HostServer implements AutoCloseable {
      * @author Harry Xu
      * @version 1.0 - December 24th 2023
      */
-    public class SocketHeartbeat extends TimerTask {
+    private class SocketHeartbeat extends TimerTask {
         private final ClientConnection client;
         private final OutputStreamWriter output;
 
@@ -391,6 +402,35 @@ public class HostServer implements AutoCloseable {
 
                 // Cancel task
                 this.cancel();
+            }
+        }
+    }
+
+    private class BroadcastThread extends Thread {
+        private final ServerCode code;
+
+        public BroadcastThread(ServerCode code) {
+            this.code = code;
+        }
+
+        @Override
+        public void run() {
+            for (ClientConnection connection : connections) {
+                OutputStreamWriter output;
+
+                try {
+                    output = new OutputStreamWriter(connection.getSocket().getOutputStream());
+                } catch (IOException e) {
+                    System.out.println("Unable to establish broadcast connection to client " + connection.getName() + ".");
+                    continue;
+                }
+
+                try {
+                    output.write(this.code.ordinal());
+                    output.flush();
+                } catch (IOException e) {
+                    System.out.println("Failed to broadcast to client " + connection.getName() + ".");
+                }
             }
         }
     }

@@ -13,6 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -49,9 +52,10 @@ public class SubmissionsPanel extends JPanel {
         header.setAlignmentX(0.5f);
 
         this.submissions = new JList<>();
-        this.submissions.addMouseListener(new ViewCodeListener(this::updateData));
+        this.submissions.getSelectionModel().addListSelectionListener(new ViewCodeListener(this::updateData));
         this.submissions.setFont(new Font(Const.MONOSPACE_FONT, Font.PLAIN, 16));
         this.submissions.setVisibleRowCount(20);
+        this.submissions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(this.submissions);
 
         JButton startGameButton = new CustomButton("Start Game");
@@ -84,7 +88,7 @@ public class SubmissionsPanel extends JPanel {
         this.submissions.setListData(listData);
     }
 
-    private class ViewCodeListener extends MouseAdapter {
+    private class ViewCodeListener implements ListSelectionListener {
 
         private final Consumer<ClientConnection> onDelete;
 
@@ -93,8 +97,8 @@ public class SubmissionsPanel extends JPanel {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
-            int submissionIndex = submissions.getSelectedIndex();
+        public void valueChanged(ListSelectionEvent e) {
+            int submissionIndex = e.getFirstIndex();
             ClientConnection client = clients.get(submissionIndex);
             CodeViewFrame codeViewFrame = new CodeViewFrame(client, this.onDelete);
             codeViewFrame.setVisible(true);

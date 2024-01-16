@@ -3,6 +3,7 @@ package ui.host;
 import client.ClientConnection;
 import game.GamePanel;
 import server.HostServer;
+import server.ServerCode;
 import server.ServerState;
 import ui.Const;
 
@@ -74,6 +75,8 @@ public class HostApplication {
                 .collect(Collectors.toSet());
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        this.server.broadcast(ServerCode.NEXT_SCREEN);
 
         // Close server
         try {
