@@ -254,6 +254,8 @@ public class GamePanel extends JPanel {
 
             GameObject newObject = this.map[newY][newX];
 
+            boolean movePlayer = true;
+
             // Collisions
             if (player != newObject) {
                 if (newObject instanceof Currency) {
@@ -263,11 +265,15 @@ public class GamePanel extends JPanel {
                     Player enemy = (Player) newObject;
 
                     player.fight(enemy);
+
+                    movePlayer = false;
                 }
             }
 
-            this.map[y][x] = null;
-            this.map[newY][newX] = player;
+            if (movePlayer) {
+                this.map[y][x] = null;
+                this.map[newY][newX] = player;
+            }
         }
     }
 

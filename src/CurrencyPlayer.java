@@ -6,12 +6,7 @@ public class CurrencyPlayer extends Player {
         Point currencyLocation = data.getCurrencyLocation(1);
 
         if (currencyLocation != null) {
-            System.out.println(currencyLocation);
-
             QueryData queryData = data.query(currencyLocation);
-
-            System.out.println(queryData.getEnemies());
-            System.out.println(queryData.getCurrency());
 
             Point currentPosition = data.getPosition();
 
