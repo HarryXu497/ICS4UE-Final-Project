@@ -25,6 +25,10 @@ public class GamePanel extends JPanel {
     private static final int CURRENCY_VARIANCE = 3;
     private static final int MIN_CURRENCY = 4;
 
+    private static final int TILES_PER_PLAYER = 100;
+    private static final int MAX_HEIGHT = 40;
+    private static final int MIN_HEIGHT = 25;
+
     private final Consumer<String> onWin;
 
     private final Set<Player> players;
@@ -38,22 +42,6 @@ public class GamePanel extends JPanel {
 
     public GamePanel(Set<ClientConnection> clients, Dimension panelSize, Consumer<String> onWin) {
         this.onWin = onWin;
-
-        int gridHeight = 25; // TODO: make this dynamic
-        this.gridSize = panelSize.height / gridHeight;
-        int gridWidth = panelSize.width / this.gridSize;
-        this.map = new GameObject[gridHeight - 2][gridWidth];
-        this.mapTiles = new Image[gridHeight - 2][gridWidth];
-        this.currentCycle = 1;
-
-        this.currencies = new HashSet<>();
-
-        // Initialize sprites
-        try {
-            Assets.initialize(this.gridSize);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         // Load players
         ObjectLoader objectLoader;
@@ -78,6 +66,38 @@ public class GamePanel extends JPanel {
             }
 
             this.players.add(player);
+        }
+
+        // Game map dimensions
+        int gridHeight = (int) Math.floor(
+                Math.sqrt(
+                        this.players.size() * TILES_PER_PLAYER * panelSize.height / (double) panelSize.width
+                )
+        );
+
+        if (gridHeight < MIN_HEIGHT) {
+            gridHeight = MIN_HEIGHT;
+        }
+
+        if (gridHeight > MAX_HEIGHT) {
+            gridHeight = MAX_HEIGHT;
+        }
+
+        this.gridSize = panelSize.height / gridHeight;
+        int gridWidth = panelSize.width / this.gridSize;
+        this.map = new GameObject[gridHeight - 2][gridWidth];
+        this.mapTiles = new Image[gridHeight - 2][gridWidth];
+        this.currentCycle = 1;
+
+        System.out.println(this.map.length * this.map[0].length);
+
+        this.currencies = new HashSet<>();
+
+        // Initialize sprites
+        try {
+            Assets.initialize(this.gridSize);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         // Generate map tiles

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Contains tile-related assets
  * @author Tommy Shan
- * @version 1.0 - January 11th 2023
+ * @version 1.0 - January 10th 2024
  */
 public class TileAssets {
     private final double MAIN_SPRITE_WEIGHT = 0.8;

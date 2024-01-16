@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Represents a game object in the game which can be draw and animated
  * @author Tommy Shan
- * @version 1.0 - January 9th 2023
+ * @version 1.0 - January 9th 2024
  */
 public abstract class GameObject {
     /**

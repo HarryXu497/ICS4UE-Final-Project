@@ -17,7 +17,6 @@ public class HostPanel extends JPanel {
     private final Procedure onStart;
     private final HostServer host;
     private final CustomLabel connectionsLabel;
-    private final CustomButton startButton;
 
     public HostPanel(HostServer host, Procedure onStart) {
         this.onStart = onStart;
@@ -31,20 +30,20 @@ public class HostPanel extends JPanel {
         CustomLabel portLabel = new CustomLabel("Port: ", Integer.toString(this.host.getPort()));
         this.connectionsLabel = new CustomLabel("Connections: ", Integer.toString(0));
 
-        this.startButton = new CustomButton("Start");
-        this.startButton.addActionListener(new OnStartListener());
+        CustomButton startButton = new CustomButton("Start");
+        startButton.addActionListener(new OnStartListener());
 
         // Alignment
         ipLabel.setAlignmentX(0.5F);
         portLabel.setAlignmentX(0.5F);
         this.connectionsLabel.setAlignmentX(0.5F);
-        this.startButton.setAlignmentX(0.5F);
+        startButton.setAlignmentX(0.5F);
 
         this.add(Box.createVerticalGlue());
         this.add(ipLabel);
         this.add(portLabel);
         this.add(this.connectionsLabel);
-        this.add(this.startButton);
+        this.add(startButton);
         this.add(Box.createRigidArea(new Dimension(0, 25)));
         this.add(Box.createVerticalGlue());
 

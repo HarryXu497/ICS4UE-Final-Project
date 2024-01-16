@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Contains GUI-related assets.
  * @author Tommy Shan
- * @version 1.0 - January 11th 2023
+ * @version 1.0 - January 10th 2024
  */
 public class GuiAssets {
     private final Image heart;

@@ -3,7 +3,7 @@ package game.actions;
 /**
  * Represents a move action by the player.
  * @author Tommy Shan
- * @version 1.0 - January 8th 2023
+ * @version 1.0 - January 8th 2024
  */
 public enum Move {
     UP(0, -1),

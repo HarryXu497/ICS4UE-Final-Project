@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 /**
  * Singleton class to allow for global access to assets (e.g. sprites and fonts) .
  * @author Tommy Shan
- * @version 1.0 - January 10th 2023
+ * @version 1.0 - January 10th 2024
  */
 public class Assets {
     /** Singleton instance */

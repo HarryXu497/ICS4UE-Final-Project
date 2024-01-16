@@ -8,7 +8,7 @@ import java.awt.Image;
 /**
  * Represents a currency that can be collected by players.
  * @author Tommy Shan
- * @version 1.0 - January 9th 2023
+ * @version 1.0 - January 9th 2024
  */
 public class Currency extends GameObject {
     private final Image[] sprites;

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Contains player-related assets
  * @author Tommy Shan
- * @version 1.0 - January 11th 2023
+ * @version 1.0 - January 10th 2024
  */
 public class PlayerAssets {
     private static final int MAX_FONT_SIZE = 16;
