@@ -1,6 +1,7 @@
 package server;
 
 import client.ClientConnection;
+import function.Procedure;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,22 +18,21 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 /**
- * A multi-threaded host server which handles client connections and runs the game.
+ * A multithreaded host server which handles client connections and runs the game.
  * @author Harry Xu
  * @version 1.0 - December 24th 2023
  */
 public class HostServer implements AutoCloseable {
     /** Functions to call when a socket successfully connects */
-    private final List<Consumer<ClientConnection>> onConnectSubscribers;
+    private final List<Procedure> onConnectSubscribers;
 
     /** Functions to call when a socket disconnects */
-    private final List<Consumer<ClientConnection>> onDisconnectSubscribers;
+    private final List<Procedure> onDisconnectSubscribers;
 
     /** Functions to call when a client submits their code */
-    private final List<Consumer<ClientConnection>> onSubmissionSubscribers;
+    private final List<Procedure> onSubmissionSubscribers;
 
     private final ServerSocket serverSocket;
     private final Set<ClientConnection> connections;
@@ -84,7 +84,7 @@ public class HostServer implements AutoCloseable {
      * Adds a listener function to call when a client socket connects.
      * @param subscriber the callback function
      */
-    public void onConnect(Consumer<ClientConnection> subscriber) {
+    public void onConnect(Procedure subscriber) {
         this.onConnectSubscribers.add(subscriber);
     }
 
@@ -93,7 +93,7 @@ public class HostServer implements AutoCloseable {
      * Adds a listener function to call when a client socket disconnects.
      * @param subscriber the callback function
      */
-    public void onDisconnect(Consumer<ClientConnection> subscriber) {
+    public void onDisconnect(Procedure subscriber) {
         this.onDisconnectSubscribers.add(subscriber);
     }
 
@@ -102,7 +102,7 @@ public class HostServer implements AutoCloseable {
      * Adds a listener function to call when a client socket submits code
      * @param subscriber the callback function
      */
-    public void onSubmit(Consumer<ClientConnection> subscriber) {
+    public void onSubmit(Procedure subscriber) {
         this.onSubmissionSubscribers.add(subscriber);
     }
 
@@ -268,8 +268,8 @@ public class HostServer implements AutoCloseable {
             String name = this.input.readLine();
 
             if (nameSet.contains(name)) {
-                output.write(ServerCode.DISCONNECT.ordinal());
-                output.flush();
+                this.output.write(ServerCode.DISCONNECT.ordinal());
+                this.output.flush();
                 return;
             }
 
@@ -279,8 +279,8 @@ public class HostServer implements AutoCloseable {
 
             // Call connect listeners
             synchronized (onConnectSubscribers) {
-                for (Consumer<ClientConnection> onConnect : onConnectSubscribers) {
-                    onConnect.accept(this.client);
+                for (Procedure onConnect : onConnectSubscribers) {
+                    onConnect.execute();
                 }
             }
 
@@ -313,8 +313,8 @@ public class HostServer implements AutoCloseable {
 
                         // Call submit listeners
                         synchronized (onSubmissionSubscribers) {
-                            for (Consumer<ClientConnection> onSubmit : onSubmissionSubscribers) {
-                                onSubmit.accept(this.client);
+                            for (Procedure onSubmit: onSubmissionSubscribers) {
+                                onSubmit.execute();
                             }
                         }
                     }
@@ -331,8 +331,10 @@ public class HostServer implements AutoCloseable {
             try {
                 this.handle();
             } catch (IOException e) {
-                System.out.println("Error occurred while handling client socket.");
-                e.printStackTrace(); // TODO: remove these
+                // Connection reset is thrown when the host closes the clients
+                if (!e.getMessage().equals("Connection reset")) {
+                    System.out.println("Error occurred while handling client socket.");
+                }
             } finally {
                 try {
                     this.close();
@@ -384,8 +386,8 @@ public class HostServer implements AutoCloseable {
 
                 // Call disconnect listeners
                 synchronized (onDisconnectSubscribers) {
-                    for (Consumer<ClientConnection> onDisconnect : onDisconnectSubscribers) {
-                        onDisconnect.accept(client);
+                    for (Procedure onDisconnect : onDisconnectSubscribers) {
+                        onDisconnect.execute();
                     }
                 }
 

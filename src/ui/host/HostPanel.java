@@ -1,6 +1,5 @@
 package ui.host;
 
-import client.ClientConnection;
 import function.Procedure;
 import server.HostServer;
 import ui.components.CustomButton;
@@ -13,12 +12,22 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Host panel displaying information for joining the game
+ * @author Harry Xu
+ * @version 1.0 - December 24th 2023
+ */
 public class HostPanel extends JPanel {
     private final Procedure onStart;
     private final HostServer host;
     private final CustomLabel connectionsLabel;
 
-    public HostPanel(HostServer host, Procedure onStart) {
+    /**
+     * Constructs a {@link HostPanel}.
+     * @param host the host server of the game
+     * @param onStart a callback function to call when the host starts the game
+     */
+    HostPanel(HostServer host, Procedure onStart) {
         this.onStart = onStart;
         this.host = host;
 
@@ -39,6 +48,7 @@ public class HostPanel extends JPanel {
         this.connectionsLabel.setAlignmentX(0.5F);
         startButton.setAlignmentX(0.5F);
 
+        // Adding to panel
         this.add(Box.createVerticalGlue());
         this.add(ipLabel);
         this.add(portLabel);
@@ -47,15 +57,32 @@ public class HostPanel extends JPanel {
         this.add(Box.createRigidArea(new Dimension(0, 25)));
         this.add(Box.createVerticalGlue());
 
+        // Attaching server listeners
         this.host.onConnect(this::updateConnections);
         this.host.onDisconnect(this::updateConnections);
     }
 
-    private void updateConnections(ClientConnection client) {
+    /**
+     * updateConnections
+     * Updates the text of the {@link HostPanel#connectionsLabel}
+     * to match the number of host server connections.
+     */
+    private void updateConnections() {
         this.connectionsLabel.setContent(Integer.toString(this.host.getNumConnections()));
     }
 
+    /**
+     * Executes the {@link HostPanel#onStart} callback when the
+     * start button is pressed.
+     * @author Harry Xu
+     * @version 1.0 - December 24th 2023
+     */
     private class OnStartListener implements ActionListener {
+        /**
+         * actionPerformed
+         * Invoked when the button is pressed.
+         * @param e the {@link ActionEvent} object
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             onStart.execute();

@@ -66,7 +66,7 @@ public class SubmissionsPanel extends JPanel {
         this.add(startGameButton, BorderLayout.PAGE_END);
     }
 
-    public void updateData(ClientConnection client) {
+    public void updateData() {
         Set<ClientConnection> connections = this.server.getConnections();
 
         this.clients.clear();
@@ -90,9 +90,9 @@ public class SubmissionsPanel extends JPanel {
 
     private class ViewCodeListener implements ListSelectionListener {
 
-        private final Consumer<ClientConnection> onDelete;
+        private final Procedure onDelete;
 
-        public ViewCodeListener(Consumer<ClientConnection> onDelete) {
+        public ViewCodeListener(Procedure onDelete) {
             this.onDelete = onDelete;
         }
 

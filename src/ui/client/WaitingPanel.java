@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Waits until the host starts the game.
+ * Panel for waiting until the host starts the game.
  * @author Harry Xu
  * @version 1.0 - December 25th 2023
  */

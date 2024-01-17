@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,13 +18,17 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.util.function.Consumer;
 
+/**
+ * A vertical group of horizontal {@link JLabel} and {@link JTextField} pairs.
+ * @author Harry Xu
+ * @version 1.0 - December 26th 2023
+ */
 public class CodeViewFrame extends JFrame {
     private final ClientConnection client;
-    private final Consumer<ClientConnection> onDelete;
+    private final Procedure onDelete;
 
-    public CodeViewFrame(ClientConnection client, Consumer<ClientConnection> onDelete) {
+    public CodeViewFrame(ClientConnection client, Procedure onDelete) {
         this.client = client;
         this.onDelete = onDelete;
 
@@ -61,7 +66,7 @@ public class CodeViewFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             client.deleteCode();
 
-            onDelete.accept(client);
+            onDelete.execute();
 
             dispatchEvent(new WindowEvent(CodeViewFrame.this, WindowEvent.WINDOW_CLOSING));
         }

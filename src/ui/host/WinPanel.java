@@ -14,7 +14,7 @@ public class WinPanel extends JPanel {
         this.add(Box.createVerticalGlue());
 
         if (standings.size() == 0) {
-            this.add(new CustomLabel("Nobody Wins :(", "", 32));
+            this.add(new CustomLabel("Nobody Wins :(", 32));
         }
 
         // Display standings
@@ -25,7 +25,7 @@ public class WinPanel extends JPanel {
                 fontSize = 32;
             }
 
-            this.add(new CustomLabel("#" + (i + 1) + ": " + standings.get(standings.size() - i - 1) , "", fontSize));
+            this.add(new CustomLabel("#" + (i + 1) + ": ", standings.get(standings.size() - i - 1), fontSize));
             this.add(Box.createVerticalStrut(5));
         }
 
