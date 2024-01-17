@@ -18,17 +18,21 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
+/**
+ * Client GUI application for connecting to the host
+ * @author Harry Xu
+ * @version 1.0 - December 23rd 2023
+ */
 public class ClientApplication {
     private final JFrame frame;
     private final JoinPanel joinPanel;
     private WaitingPanel waitingPanel;
-    private CodePanel codePanel;
-
     private ClientConnection client;
     private InputStreamReader input;
     private OutputStreamWriter output;
 
     static {
+        // Load fonts
         try {
             GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/OpenSans.ttf")));
@@ -39,19 +43,36 @@ public class ClientApplication {
         }
     }
 
+    /**
+     * Constructs a {@link ClientConnection}
+     */
     public ClientApplication() {
+        // Frame initialization
         this.frame = new JFrame("Client");
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setSize(Const.FRAME_WIDTH, Const.FRAME_HEIGHT);
         this.frame.getContentPane().setBackground(Const.PRIMARY_COLOR);
+
         this.joinPanel = new JoinPanel(this::connectSocket);
         this.frame.add(this.joinPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * run
+     * Runs the application
+     */
     public void run() {
         this.frame.setVisible(true);
     }
 
+    /**
+     * connectSocket
+     * Attempts to connect to the {@link server.HostServer} socket.
+     * @param ip the host ip address
+     * @param port the host server port
+     * @param name the name of the client
+     * @throws IOException if an I/O error occurs while attempting to connect to socket
+     */
     private void connectSocket(String ip, int port, String name) throws IOException {
         try {
             this.client = new ClientConnection(new Socket(ip, port));
@@ -87,15 +108,21 @@ public class ClientApplication {
         this.frame.revalidate();
         this.frame.repaint();
 
+        // Waits for the host to start the game
         NextScreenThread waitingThread = new NextScreenThread(this::endWaiting);
         waitingThread.start();
     }
 
+    /**
+     * endWaiting
+     * Transitions to the code submission screen.
+     */
     private void endWaiting() {
-        this.codePanel = new CodePanel(this.client, this::sendProgram);
         this.waitingPanel.stopTimer();
+
+        CodePanel codePanel = new CodePanel(this.client, this::sendProgram);
         this.frame.remove(this.waitingPanel);
-        this.frame.add(this.codePanel, BorderLayout.CENTER);
+        this.frame.add(codePanel, BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
 
@@ -104,16 +131,22 @@ public class ClientApplication {
         closeScreenThread.start();
     }
 
-    private void sendProgram(String program) {
-        try {
-            output.write(program);
-            output.write(ServerCode.SUBMISSION_FINISHED.ordinal());
-            output.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * sendProgram
+     * Write the client's program to the host socket.
+     * @param program the program source code
+     * @throws IOException if an I/O error occurs when writing to the host socket
+     */
+    private void sendProgram(String program) throws IOException {
+        this.output.write(program);
+        this.output.write(ServerCode.SUBMISSION_FINISHED.ordinal());
+        this.output.flush();
     }
 
+    /**
+     * closeFrame
+     * Closes the client application and GUI.
+     */
     private void closeFrame() {
         this.frame.dispatchEvent(new WindowEvent(this.frame, WindowEvent.WINDOW_CLOSING));
 
@@ -124,6 +157,11 @@ public class ClientApplication {
         }
     }
 
+    /**
+     * close
+     * Closes the socket and its input streams.
+     * @throws IOException if an I/O error occurs while attempting to close the socket
+     */
     public void close() throws IOException {
         if (this.client == null) {
             return;
@@ -142,14 +180,29 @@ public class ClientApplication {
         }
     }
 
+    /**
+     * Thread that waits for the {@link ServerCode#NEXT_SCREEN} message
+     * from the server and calls the callback function when received.
+     * @author Harry Xu
+     * @version 1.0 - December 23rd 2023
+     */
     private class NextScreenThread extends Thread {
-
         private final Procedure onNextScreen;
 
+        /**
+         * Constructs a {@link NextScreenThread} with a callback
+         * to call when the {@link ServerCode#NEXT_SCREEN} message is received
+         * @param onNextScreen the function which is called when the
+         *                      {@link ServerCode#NEXT_SCREEN} message is received
+         */
         public NextScreenThread(Procedure onNextScreen) {
             this.onNextScreen = onNextScreen;
         }
 
+        /**
+         * run
+         * Runs the thread.
+         */
         @Override
         public void run() {
             try {
@@ -159,12 +212,14 @@ public class ClientApplication {
             }
 
             try {
-                while (true) {
+                boolean nextScreenReceived = false;
+
+                while (!nextScreenReceived) {
                     int c = input.read();
 
                     if (c == ServerCode.NEXT_SCREEN.ordinal()) {
                         this.onNextScreen.execute();
-                        break;
+                        nextScreenReceived = true;
                     }
                 }
             } catch (IOException e) {

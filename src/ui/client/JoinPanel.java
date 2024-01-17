@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -20,8 +22,12 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+/**
+ * Client panel for code submissions.
+ * @author Harry Xu
+ * @version 1.0 - December 24th 2023
+ */
 public class JoinPanel extends JPanel {
-
     private final ConnectConsumer onJoin;
     private final JTextField ipField;
     private final JTextField portField;
@@ -29,7 +35,12 @@ public class JoinPanel extends JPanel {
     private final JLabel errorMessage;
     private final CustomButton submitButton;
 
-    public JoinPanel(ConnectConsumer onJoin) {
+    /**
+     * Constructs a {@link JoinPanel} with a connection callback.
+     * @param onJoin the callback function to call when the client
+     *               attempts to connect to the host
+     */
+    JoinPanel(ConnectConsumer onJoin) {
         this.onJoin = onJoin;
 
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -52,8 +63,7 @@ public class JoinPanel extends JPanel {
 
         // Submit Button
         this.submitButton = new CustomButton("Join");
-        this.submitButton.addMouseListener(new SubmitListener());
-
+        this.submitButton.addActionListener(new SubmitListener());
 
         // Alignment
         label.setAlignmentX(0.5F);
@@ -73,18 +83,34 @@ public class JoinPanel extends JPanel {
         this.add(Box.createVerticalGlue());
     }
 
+    /**
+     * setErrorMessage
+     * Sets the text of the {@link JoinPanel#errorMessage} label.
+     * @param message the message to set the label text to
+     */
     private void setErrorMessage(String message) {
-        errorMessage.setText(message);
-        errorMessage.setVisible(message.length() != 0);
+        this.errorMessage.setText(message);
+        this.errorMessage.setVisible(message.length() != 0);
     }
 
-    private class SubmitListener extends MouseAdapter {
+    /**
+     * Listens to submit button events.
+     * @author Harry Xu
+     * @version 1.0 - December 24th 2023
+     */
+    private class SubmitListener implements ActionListener {
+        /**
+         * actionPerformed
+         * Called when the submit button is pressed.
+         * @param e the {@link ActionEvent} object.
+         */
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void actionPerformed(ActionEvent e) {
             if (!submitButton.isEnabled()) {
                 return;
             }
 
+            // Get data from fields
             submitButton.setEnabled(false);
             String ip = ipField.getText();
             int port;
@@ -104,11 +130,18 @@ public class JoinPanel extends JPanel {
                 return;
             }
 
+            // Attempt to connect to server on background thread
             ConnectThread connectThread = new ConnectThread(ip, port, name);
             connectThread.start();
         }
     }
 
+    /**
+     * isValidName
+     * Validates a client's name.
+     * @param name the name to validate
+     * @return if the name is valid
+     */
     private static boolean isValidName(String name) {
         if (name.length() == 0) {
             return false;
@@ -129,6 +162,12 @@ public class JoinPanel extends JPanel {
         return true;
     }
 
+    /**
+     * isValidCharacter
+     * Validates a single character in the client's name.
+     * @param c the char to validate
+     * @return if the char is valid
+     */
     private static boolean isValidCharacter(char c) {
         return (Character.isAlphabetic(c)) ||
                 (Character.isDigit(c)) ||
@@ -136,17 +175,32 @@ public class JoinPanel extends JPanel {
                 (c == '$');
     }
 
+    /**
+     * Attempts to connect the client with a {@link server.HostServer}.
+     * @author Harry Xu
+     * @version 1.0 - December 24th 2023
+     */
     private class ConnectThread extends Thread {
         private final String ip;
         private final int port;
         private final String name;
 
+        /**
+         * Constructs a {@link ConnectThread}.
+         * @param ip the ip of the host
+         * @param port the port of the host socket
+         * @param name the name of the client
+         */
         public ConnectThread(String ip, int port, String name) {
             this.ip = ip;
             this.port = port;
             this.name = name;
         }
 
+        /**
+         * run
+         * Runs the thread.
+         */
         @Override
         public void run() {
             submitButton.setEnabled(true);
@@ -156,10 +210,9 @@ public class JoinPanel extends JPanel {
             } catch (UnknownHostException e) {
                 setErrorMessage("Unknown host IP address");
             } catch (ConnectException e) {
-                e.printStackTrace();
                 setErrorMessage("Connection refused");
             } catch (SocketException e) {
-              setErrorMessage("Network is unreachable");
+                setErrorMessage("Network is unreachable");
             } catch (IllegalArgumentException e) {
                 setErrorMessage(e.getMessage());
             } catch (IOException e) {
