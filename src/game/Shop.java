@@ -11,7 +11,7 @@ public class Shop {
 
     private final Player player;
 
-    public Shop(Player player) {
+    Shop(Player player) {
         this.player = player;
     }
 

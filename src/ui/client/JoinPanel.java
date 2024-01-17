@@ -98,7 +98,7 @@ public class JoinPanel extends JPanel {
                 return;
             }
 
-            if (name.length() == 0) {
+            if (!isValidName(name)) {
                 setErrorMessage("Invalid Name");
                 submitButton.setEnabled(true);
                 return;
@@ -107,6 +107,33 @@ public class JoinPanel extends JPanel {
             ConnectThread connectThread = new ConnectThread(ip, port, name);
             connectThread.start();
         }
+    }
+
+    private static boolean isValidName(String name) {
+        if (name.length() == 0) {
+            return false;
+        }
+
+        if (!Character.isUpperCase(name.charAt(0))) {
+            return false;
+        }
+
+        for (int i = 1; i < name.length(); i++) {
+            char currentChar = name.charAt(i);
+
+            if (!isValidCharacter(currentChar)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isValidCharacter(char c) {
+        return (Character.isAlphabetic(c)) ||
+                (Character.isDigit(c)) ||
+                (c == '_') ||
+                (c == '$');
     }
 
     private class ConnectThread extends Thread {

@@ -13,25 +13,39 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+/**
+ * A Swing component responsible for managing and displaying the game.
+ * @author Tommy Shan
+ * @author Harry Xu
+ * @version 1.0 - January 8th 2024
+ */
 public class GamePanel extends JPanel {
+    /** Game constants */
     private static final int TICKS_PER_UPDATE = 8;
+    private static final int MS_PER_TICK = 100;
     private static final int CYCLES_DAMAGE = 10;
     private static final int CURRENCY_VARIANCE = 3;
     private static final int MIN_CURRENCY = 4;
 
+    /** Map generation constants */
     private static final int TILES_PER_PLAYER = 100;
     private static final int MAX_HEIGHT = 40;
     private static final int MIN_HEIGHT = 25;
 
-    private final Consumer<String> onWin;
+    private final Timer gameLoop;
+    private final Consumer<List<String>> onWin;
 
     private final Set<Player> players;
+    private final List<Player> playerStandings;
     private final Set<Currency> currencies;
 
     private final int gridSize;
@@ -40,7 +54,14 @@ public class GamePanel extends JPanel {
     private final GameObject[][] map;
     private final Image[][] mapTiles;
 
-    public GamePanel(Set<ClientConnection> clients, Dimension panelSize, Consumer<String> onWin) {
+    /**
+     * Constructs a {@link GamePanel}.
+     * @param clients the clients with submitted codes
+     * @param panelSize the size that the panel will eventually occupy.
+     *                  Used to generate the map
+     * @param onWin the callback function which is called when the game is won
+     */
+    public GamePanel(Set<ClientConnection> clients, Dimension panelSize, Consumer<List<String>> onWin) {
         this.onWin = onWin;
 
         // Game map dimensions
@@ -63,6 +84,8 @@ public class GamePanel extends JPanel {
         this.map = new GameObject[gridHeight - 2][gridWidth];
         this.mapTiles = new Image[gridHeight - 2][gridWidth];
         this.currentCycle = 1;
+
+        this.gameLoop = new Timer();
 
         // Initialize sprites
         try {
@@ -97,6 +120,7 @@ public class GamePanel extends JPanel {
         }
 
         this.currencies = new HashSet<>();
+        this.playerStandings = new ArrayList<>();
 
         // Generate map tiles
         for (int y = 0; y < this.mapTiles.length; y++) {
@@ -124,23 +148,27 @@ public class GamePanel extends JPanel {
         this.setIgnoreRepaint(true);
     }
 
-    public int getGridSize() {
-        return this.gridSize;
-    }
-
+    /**
+     * start
+     * Starts the game.
+     */
     public void start() {
-        Timer gameLoop = new Timer();
-        gameLoop.schedule(new GameLoopTask(), 0, 100);
+        this.gameLoop.schedule(new GameLoopTask(), 0, MS_PER_TICK);
     }
 
-    public void runCycle() {
-        boolean damagePlayers = this.currentCycle % CYCLES_DAMAGE == 0;
-        int numPlayers = 0;
-
+    /**
+     * runCycle
+     * Runs an update cycle on the map
+     */
+    public void runUpdate() {
         this.generateCurrency();
+
+        // If players should be damaged this cycle
+        boolean damagePlayers = this.currentCycle % CYCLES_DAMAGE == 0;
 
         Set<Player> movedPlayers = new HashSet<>();
 
+        // Iterate through map
         for (int y = 0; y < this.map.length; y++) {
             for (int x = 0; x < this.map[y].length; x++) {
                 GameObject currentObject = this.map[y][x];
@@ -148,6 +176,7 @@ public class GamePanel extends JPanel {
                 if (currentObject instanceof Player) {
                     Player player = (Player) currentObject;
 
+                    // If player has already been moved
                     if (movedPlayers.contains(player)) {
                         continue;
                     }
@@ -162,19 +191,18 @@ public class GamePanel extends JPanel {
                     if (player.getHealth() == 0) {
                         this.map[y][x] = null;
                         this.players.remove(player);
+                        this.playerStandings.add(player);
                         continue;
                     }
 
+                    // Call player cycle method
                     Data data = new Data(this.map, player, this.players.size(), this.currencies.size(), x, y);
                     Shop shop = new Shop(player);
-
-                    numPlayers++;
 
                     try {
                         player.update(data, shop);
                     } catch (RuntimeException e) {
                         System.out.println("An error occurred in " + player.getName() + "'s player");
-                        e.printStackTrace();
                     }
 
                     // Move
@@ -183,35 +211,33 @@ public class GamePanel extends JPanel {
             }
         }
 
-        if (numPlayers == 1) {
-            Player winner = null;
+        // Player standings
+        if (this.players.size() <= 1) {
+            this.playerStandings.addAll(this.players);
 
-            for (int y = 0; y < this.map.length; y++) {
-                for (int x = 0; x < this.map[y].length; x++) {
-                    GameObject currentObject = this.map[y][x];
+            List<String> playerNames = this.playerStandings
+                    .stream()
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
 
-                    if (currentObject instanceof Player) {
-                        winner = (Player) currentObject;
-                    }
-                }
-            }
+            this.gameLoop.cancel();
 
-            if (winner == null) {
-                throw new RuntimeException("This should never happen");
-            }
-
-            onWin.accept(winner.getName());
+            this.onWin.accept(playerNames);
             return;
         }
 
         this.currentCycle++;
     }
 
+    /**
+     * runTick
+     * Runs an animation frame (a tick).
+     * An animation frame is NOT the same as an update cycle.
+     * Animation frames occur more often to create a smoother animation.
+     */
     public void runTick() {
-        for (int y = 0; y < this.map.length; y++) {
-            for (int x = 0; x < this.map[y].length; x++) {
-                GameObject currentObject = this.map[y][x];
-
+        for (GameObject[] gameObjects : this.map) {
+            for (GameObject currentObject : gameObjects) {
                 if (currentObject != null) {
                     currentObject.tick();
                 }
@@ -221,6 +247,10 @@ public class GamePanel extends JPanel {
         repaint();
     }
 
+    /**
+     * generateCurrency
+     * Randomly generates currency throughout the map.
+     */
     public void generateCurrency() {
         int variance = ((int) (Math.random() * 2 * CURRENCY_VARIANCE)) - CURRENCY_VARIANCE;
         int numCurrency = Math.max(this.players.size() + variance, MIN_CURRENCY);
@@ -237,50 +267,66 @@ public class GamePanel extends JPanel {
         }
     }
 
+    /**
+     * movePlayer
+     * Moves the player on the map.
+     * @param player the player to move
+     * @param x the x coordinate of the location of the player
+     * @param y the y coordinate of the location of the player
+     */
     public void movePlayer(Player player, int x, int y) {
         Move move = player.getMove();
 
-        if (move != null) {
-            int newY = y + move.getDeltaY();
-            int newX = x + move.getDeltaX();
+        if (move == null) {
+            return;
+        }
 
-            if ((newY < 0) || (newY >= this.map.length)) {
-                newY = y;
+        // Move player if possible
+        int newY = y + move.getDeltaY();
+        int newX = x + move.getDeltaX();
+
+        if ((newY < 0) || (newY >= this.map.length)) {
+            newY = y;
+        }
+
+        if ((newX < 0) || (newX >= this.map[newY].length)) {
+            newX = x;
+        }
+
+        GameObject newObject = this.map[newY][newX];
+
+        boolean movePlayer = true;
+
+        // Collisions
+        if (player != newObject) {
+            if (newObject instanceof Currency) {
+                player.setCurrency(player.getCurrency() + 1);
+                this.currencies.remove(newObject);
+            } else if (newObject instanceof Player) {
+                Player enemy = (Player) newObject;
+                player.fight(enemy);
+
+                movePlayer = false;
             }
+        }
 
-            if ((newX < 0) || (newX >= this.map[newY].length)) {
-                newX = x;
-            }
-
-            GameObject newObject = this.map[newY][newX];
-
-            boolean movePlayer = true;
-
-            // Collisions
-            if (player != newObject) {
-                if (newObject instanceof Currency) {
-                    player.setCurrency(player.getCurrency() + 1);
-                    this.currencies.remove(newObject);
-                } else if (newObject instanceof Player) {
-                    Player enemy = (Player) newObject;
-
-                    player.fight(enemy);
-
-                    movePlayer = false;
-                }
-            }
-
-            if (movePlayer) {
-                this.map[y][x] = null;
-                this.map[newY][newX] = player;
-            }
+        // Move player
+        if (movePlayer) {
+            this.map[y][x] = null;
+            this.map[newY][newX] = player;
         }
     }
 
+    /**
+     * paintComponent
+     * Draws the game.
+     * @param g the {@link Graphics} object used for drawing
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // Draw background tiles
         for (int y = 0; y < this.map.length; y++) {
             for (int x = 0; x < this.map[y].length; x++) {
                 int xCoord = x * this.gridSize;
@@ -290,6 +336,7 @@ public class GamePanel extends JPanel {
             }
         }
 
+        // Draw game objects
         for (int y = 0; y < this.map.length; y++) {
             for (int x = 0; x < this.map[y].length; x++) {
                 GameObject currentObject = this.map[y][x];
@@ -304,8 +351,13 @@ public class GamePanel extends JPanel {
         }
     }
 
+    /**
+     * Task responsible for animating (ticks) and running update cycles .
+     * @author Tommy Shan
+     * @author Harry Xu
+     * @version 1.0 - January 10th 2024
+     */
     public class GameLoopTask extends TimerTask {
-
         private int ticks;
 
         public GameLoopTask() {
@@ -318,7 +370,7 @@ public class GamePanel extends JPanel {
 
 
             if (ticks % TICKS_PER_UPDATE == 0) {
-                runCycle();
+                runUpdate();
             }
 
             runTick();

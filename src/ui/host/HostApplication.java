@@ -16,6 +16,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -95,10 +96,10 @@ public class HostApplication {
         this.gamePanel.start();
     }
 
-    public void onGameWin(String winner) {
+    public void onGameWin(List<String> standings) {
         this.frame.remove(this.gamePanel);
         this.frame.setSize(new Dimension(Const.FRAME_WIDTH, Const.FRAME_HEIGHT));
-        this.frame.add(new WinPanel(winner), BorderLayout.CENTER);
+        this.frame.add(new WinPanel(standings), BorderLayout.CENTER);
         this.frame.revalidate();
         this.frame.repaint();
     }

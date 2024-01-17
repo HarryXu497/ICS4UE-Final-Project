@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -229,7 +228,7 @@ public class HostServer implements AutoCloseable {
 
         /**
          * createHeartbeat
-         * schedules a task to repeatedly send messages to the client socket to ensure accurate client pool.
+         * Schedules a task to repeatedly send messages to the client socket to ensure accurate client pool.
          * @return the timer used to schedule the task
          */
         public Timer createHeartbeat() {
@@ -250,7 +249,7 @@ public class HostServer implements AutoCloseable {
 
         /**
          * close
-         * closes the client socket and its I/O streams.
+         * Closes the client socket and its I/O streams.
          * @throws IOException If an I/O error occurs
          */
         public void close() throws IOException {
@@ -321,16 +320,11 @@ public class HostServer implements AutoCloseable {
                     }
                 }
             }
-
-
-            // Close clients
-            this.output.write(ServerCode.NEXT_SCREEN.ordinal());
-            this.output.flush();
         }
 
         /**
          * run
-         * handles the client socket connection.
+         * Handles the client socket connection.
          */
         @Override
         public void run() {
@@ -338,13 +332,13 @@ public class HostServer implements AutoCloseable {
                 this.handle();
             } catch (IOException e) {
                 System.out.println("Error occurred while handling client socket.");
-                e.printStackTrace();
+                e.printStackTrace(); // TODO: remove these
             } finally {
                 try {
                     this.close();
                 } catch (IOException e) {
                     System.out.println("Error occurred while attempting to close client socket");
-                    e.printStackTrace();
+                    e.printStackTrace(); // TODO: remove these
                 }
             }
         }
@@ -370,7 +364,7 @@ public class HostServer implements AutoCloseable {
 
         /**
          * run
-         * handles the client socket connection.
+         * Handles the client socket connection.
          */
         @Override
         public void run() {

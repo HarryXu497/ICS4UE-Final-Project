@@ -4,7 +4,6 @@ import client.ClientConnection;
 import function.Procedure;
 import server.ServerCode;
 import ui.Const;
-import ui.host.CodeViewFrame;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -41,7 +40,6 @@ public class ClientApplication {
     }
 
     public ClientApplication() {
-        // TODO: close frame when game starts
         this.frame = new JFrame("Client");
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setSize(Const.FRAME_WIDTH, Const.FRAME_HEIGHT);
@@ -117,7 +115,6 @@ public class ClientApplication {
     }
 
     private void closeFrame() {
-        System.out.println("Closing Frame");
         this.frame.dispatchEvent(new WindowEvent(this.frame, WindowEvent.WINDOW_CLOSING));
 
         try {
