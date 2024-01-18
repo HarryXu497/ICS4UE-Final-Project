@@ -25,7 +25,7 @@ public class PlayerAssets {
      * @throws IOException if an I/O error occur while reading the files
      */
     PlayerAssets(int size) throws IOException {
-        Map<String, Image[]> sprites = Assets.loadAndGroupImages(Paths.get("resources/sprites/computer2"), size);
+        Map<String, Image[]> sprites = Assets.loadAndGroupImages(Paths.get("resources/sprites"), size);
 
         this.idleSprites = sprites.get("idle");
         this.movingSprites = sprites.get("moving");
