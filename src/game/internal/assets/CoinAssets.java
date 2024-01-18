@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Tommy Shan
  * @version 1.0 - January 10th 2024
  */
-class CoinAssets {
+public class CoinAssets {
     private final Image[] coins;
 
     /**
