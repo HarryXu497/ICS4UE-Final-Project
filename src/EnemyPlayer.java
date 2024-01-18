@@ -1,5 +1,9 @@
-import game.*;
-import game.actions.*;
+import game.Data;
+import game.Player;
+import game.Point;
+import game.QueryData;
+import game.Shop;
+import game.actions.Direction;
 
 public class EnemyPlayer extends Player {
     public void cycle(Data data, Shop shop) {

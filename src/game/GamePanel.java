@@ -112,7 +112,7 @@ public class GamePanel extends JPanel {
             try {
                 player = objectLoader.load(client);
             } catch (IOException | ObjectLoaderException e) {
-                e.printStackTrace();
+                System.out.println("Could not load " + client.getName() + "'s program.");
                 continue;
             }
 

@@ -22,15 +22,17 @@ public class Point {
 
     /**
      * getX
-     * Gets the x-coordinate of the point.
+     * Returns the x-coordinate of the point.
+     * @return the x-coordinate of the point.
      */
     public int getX() {
         return this.x;
     }
 
     /**
-     * getX
-     * Gets the y-coordinate of the point.
+     * getY
+     * Returns the y-coordinate of the point.
+     * @return the y-coordinate of the point.
      */
     public int getY() {
         return this.y;

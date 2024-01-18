@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A multithreaded host server which handles client connections and runs the game.
  * @author Harry Xu
- * @version 1.0 - December 24th 2023
+ * @version 1.0 - December 20th 2023
  */
-public class HostServer implements AutoCloseable {
+public class HostServer {
     /** Functions to call when a socket successfully connects */
     private final List<Procedure> onConnectSubscribers;
 
@@ -199,7 +199,7 @@ public class HostServer implements AutoCloseable {
                     HandlerThread handlerThread = new HandlerThread(client);
                     handlerThread.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("An error occured while attempting to connection to the client");
                 }
             }
         }
@@ -340,7 +340,6 @@ public class HostServer implements AutoCloseable {
                     this.close();
                 } catch (IOException e) {
                     System.out.println("Error occurred while attempting to close client socket");
-                    e.printStackTrace(); // TODO: remove these
                 }
             }
         }
@@ -394,7 +393,7 @@ public class HostServer implements AutoCloseable {
                 // Cancel task
                 this.cancel();
             } catch (IOException e) {
-                e.printStackTrace();
+				System.out.println("An error occured while attempting to write to the client");
 
                 // Cancel task
                 this.cancel();

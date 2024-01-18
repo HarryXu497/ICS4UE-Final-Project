@@ -7,7 +7,7 @@ import java.time.LocalTime;
 /**
  * Wraps a client socket without other client information.
  * @author Harry Xu
- * @version 1.0 - January 8th 2024
+ * @version 1.0 - January 7th 2024
  */
 public class ClientConnection {
     private final Socket client;
@@ -17,6 +17,7 @@ public class ClientConnection {
 
     /**
      * Creates a connection wrapping a client socket.
+     * @param client the client socket
      */
     public ClientConnection(Socket client) {
         this.client = client;

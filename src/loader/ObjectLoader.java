@@ -24,6 +24,7 @@ public class ObjectLoader {
 
     /**
      * Constructs an {@link ObjectLoader}.
+     * @throws IOException if an I/O error occurs
      */
     public ObjectLoader() throws IOException {
         this.compiler = ToolProvider.getSystemJavaCompiler();
@@ -35,6 +36,8 @@ public class ObjectLoader {
      * Loads a single {@link Player} object with a player name and the code.
      * @param client the client which has submitted the code
      * @return an instance of submitted {@link Player} class
+	 * @throws IOException if an I/O error occurs while writing to or creating the program file
+	 * @throws ObjectLoaderException if an error occurs while compiling, loading, or instantiating the {@link Player}
      */
     public Player load(ClientConnection client) throws IOException, ObjectLoaderException {
         if (!client.hasSubmitted() || client.getName() == null) {
@@ -50,6 +53,8 @@ public class ObjectLoader {
      * @param name the player name
      * @param code the player class source code as a {@link String}
      * @return an instance of submitted {@link Player} class
+	 * @throws IOException if an I/O error occurs while writing to or creating the program file
+	 * @throws ObjectLoaderException if an error occurs while compiling, loading, or instantiating the {@link Player}
      */
     public Player load(String name, String code) throws IOException, ObjectLoaderException {
         String className = name + "Player";
