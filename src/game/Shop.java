@@ -25,7 +25,7 @@ public class Shop {
     }
 
     public void buyHealth() {
-        if (this.player.getCurrency() < HEALTH_PER_CURRENCY) {
+        if ((this.player.getCurrency() < HEALTH_PER_CURRENCY)|| (this.player.getHealth() >= Player.MAX_HEALTH)) {
             return;
         }
 
