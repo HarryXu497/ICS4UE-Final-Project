@@ -28,6 +28,7 @@ public abstract class Player extends GameObject {
     private static final int DEFAULT_RANGE = 1;
 
     public static final int MIN_HEALTH = 0;
+    public static final int MAX_HEALTH = 15;
     public static final int MIN_POWER = 1;
     public static final int MIN_CURRENCY = 0;
     public static final int MIN_RANGE = 1;
@@ -113,8 +114,17 @@ public abstract class Player extends GameObject {
      * @param enemy the other player
      */
     void fight(Player enemy) {
-        this.setHealth(this.getHealth() - enemy.getPower());
-        enemy.setHealth(enemy.getHealth() - this.getPower());
+        if(this.getPower() * this.getHealth() < enemy.getPower() * enemy.getHealth()) {
+            this.setHealth(this.getHealth() - Math.min(enemy.getPower(), enemy.getHealth()));
+            if(this.getHealth() <= 0) {
+                enemy.setCurrency(enemy.getCurrency() + (int)(0.1 * this.getCurrency()));
+            }
+        } else if(enemy.getPower() * enemy.getHealth() < this.getPower() * this.getHealth()) {
+            enemy.setHealth(enemy.getHealth() - Math.min(this.getPower(), this.getHealth()));
+            if(enemy.getHealth() <= 0) {
+                this.setCurrency(this.getCurrency() + (int)(0.1 * enemy.getCurrency()));
+            }
+        }
     }
 
     /**
