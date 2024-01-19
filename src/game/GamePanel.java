@@ -7,18 +7,14 @@ import game.internal.entities.Currency;
 import game.internal.entities.GameObject;
 import loader.ObjectLoader;
 import loader.ObjectLoaderException;
+import util.Pair;
 
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -167,6 +163,72 @@ public class GamePanel extends JPanel {
         boolean damagePlayers = this.currentCycle % CYCLES_DAMAGE == 0;
 
         Set<Player> movedPlayers = new HashSet<>();
+        Stack<Pair<Integer, Integer>> nextStack = new Stack<Pair<Integer, Integer>>();
+        int inDegree[][] = new int[this.map.length][this.map[0].length];
+        for(int y = 0; y < this.map.length; y++) {
+            for(int x = 0; x < this.map[y].length; x++) {
+                for(int dy = -1; dy <= 1; dy++) {
+                    for(int dx = -1; dx <= 1; dx++) {
+                        if(Math.abs(dx + dy) != 1) {
+                            continue;
+                        }
+
+                        int newY = y + dy;
+                        int newX = x + dx;
+
+                        if ((newY >= 0) && (newY < this.map.length) && (newX >= 0) && (newX < this.map[newY].length)
+                                && (this.map[newY][newX] != null) && (this.map[newY][newX] instanceof Player)
+                                && (((Player) this.map[newY][newX]).getMove().getDeltaX() + dx == 0) && (((Player) this.map[newY][newX]).getMove().getDeltaY() + dy == 0)) {
+                            inDegree[y][x]++;
+                        }
+                    }
+                }
+                if(inDegree[y][x] == 0) {
+                    nextStack.add(new Pair(y, x));
+                }
+            }
+        }
+
+        while(!nextStack.isEmpty()) {
+            Pair<Integer, Integer> current = nextStack.peek();
+            int x = current.getFirst(), y = current.getSecond();
+            GameObject currentObject = this.map[y][x];
+            if (currentObject instanceof Player) {
+                Player player = (Player) currentObject;
+
+                // If player has already been moved
+                if (movedPlayers.contains(player)) {
+                    continue;
+                }
+
+                movedPlayers.add(player);
+
+                if (damagePlayers) {
+                    player.setHealth(player.getHealth() - 1);
+                }
+
+                // Player dies
+                if (player.getHealth() == 0) {
+                    this.map[y][x] = null;
+                    this.players.remove(player);
+                    this.playerStandings.add(player);
+                    continue;
+                }
+
+                // Call player cycle method
+                Data data = new Data(this.map, player, this.players.size(), this.currencies.size(), x, y);
+                Shop shop = new Shop(player);
+
+                try {
+                    player.update(data, shop);
+                } catch (RuntimeException e) {
+                    System.out.println("An error occurred in " + player.getName() + "'s player");
+                }
+
+                // Move
+                this.movePlayer(player, x, y);
+            }
+        }
 
         // Iterate through map
         for (int y = 0; y < this.map.length; y++) {
