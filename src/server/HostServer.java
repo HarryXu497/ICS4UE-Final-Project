@@ -393,7 +393,7 @@ public class HostServer {
                 // Cancel task
                 this.cancel();
             } catch (IOException e) {
-				System.out.println("An error occured while attempting to write to the client");
+				System.out.println("An error occurred while attempting to write to the client");
 
                 // Cancel task
                 this.cancel();
