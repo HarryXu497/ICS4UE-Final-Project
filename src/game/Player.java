@@ -47,7 +47,6 @@ public abstract class Player extends GameObject {
     private Move move;
     private Direction direction;
     private Direction lastXDirection;
-    private boolean moved;
     private boolean damaged;
 
     /**

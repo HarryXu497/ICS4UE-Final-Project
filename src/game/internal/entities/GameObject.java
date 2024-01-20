@@ -1,6 +1,6 @@
 package game.internal.entities;
 
-import java.awt.*;
+import java.awt.Graphics;
 
 /**
  * Represents a game object in the game which can be draw and animated
